@@ -6,7 +6,13 @@ const getRandomInt = (max) => {
 
 const pick = (options) => options[getRandomInt(options.length)];
 
-export const render = (canvas) => ({pixelSize, width, height}) => (grid) => {
+export const render = ({pixelSize}) => (grid) => {
+
+  const canvas = document.createElement('canvas')
+  canvas.width = grid.length * pixelSize
+  canvas.height = grid[0].length * pixelSize
+  canvas.style.margin = pixelSize * 20 + 'px'
+
   const context = canvas.getContext('2d');
   grid.forEach((row, verticalIndex) => {
     row.forEach((blockColor, horizontalIndex) => {
@@ -29,18 +35,17 @@ export const render = (canvas) => ({pixelSize, width, height}) => (grid) => {
   return canvas
 };
 
-export const createCanvas = ({width, height}) => (intensityFn) => 
+export const intensityMap = ({width, height}) => (intensityFn) => 
   Array(width).fill().map((_, x) => Array(height).fill().map((_, y) => intensityFn(x, y)))
 
-const printArray = (arr) => arr.map((row) => row.join(' ')).join('\n')
 
 
 
-const shouldSplash = (intensity) => getRandomInt(intensity) + 1 === intensity 
+export const random = (intensity) => getRandomInt(intensity) + 1 === intensity 
 
 
 
-const splash = (canvas, x, y, color, size = 3) => { 
+const splashSpot = (canvas, x, y, color, size = 3) => { 
   const indexInRange = (i, y) => (i > (y - size)) && (i < (y + size))
   canvas.forEach((row, i) => {
     if (indexInRange(i, x)) {
@@ -70,22 +75,15 @@ console.log(printArray(arr))
 
 */
 
-export const splashCanvas = (size) => ({colors, width, height}) => (canvas) => {
-  const newCanvas = createCanvas({width, height})(() => undefined)
-  canvas
+export const layer = (size, colors, intensityMap) => (canvas) => {
+  intensityMap
   .forEach((row, x) => row.forEach((cellIntensity, y) => {
-    if (shouldSplash(cellIntensity)) {
-      splash(newCanvas, x, y, pick(colors), size)
+    if (random(cellIntensity)) {
+      splashSpot(canvas, x, y, pick(colors), size)
     }
   }))
-  return newCanvas
+  return canvas
 }
 
-export const layer = (size, intensityFn) => (config) => (canvas) => {
-  return rCompose([
-  createCanvas,
-  splashCanvas(size),
-  render(canvas),
-])(config)(intensityFn)
-}
-
+export const init = ({width, height}) => () => 
+  intensityMap({width, height})(() => undefined)
