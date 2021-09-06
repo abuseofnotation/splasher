@@ -27,7 +27,7 @@ export const render = ({pixelSize}) => (grid) => {
         //canvas.beginPath();
         //canvas.fillStyle = blockColor;
         //canvas.arc(width, heigth, size/2 , 0, 2 * Math.PI);
-        //canvas.fill();
+        //canvas.fill(1);
       }
 
     });
@@ -36,7 +36,7 @@ export const render = ({pixelSize}) => (grid) => {
 };
 
 export const intensityMap = ({width, height}) => (intensityFn) => 
-  Array(width).fill().map((_, x) => Array(height).fill().map((_, y) => intensityFn(x, y)))
+  Array(width).fill(1).map((_, x) => Array(height).fill(1).map((_, y) => intensityFn(x, y)))
 
 
 

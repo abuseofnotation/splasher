@@ -1,0 +1,26 @@
+{
+    "version" : "3.0.3",
+    "compilerOptions" : {
+        "module" : "amd",  /*  <----------------- REQUIRED  */
+        "removeComments" : true,
+        "outFile" : "./out.js",  /*  <----------- REQUIRED  */
+        "baseUrl" : "./",
+        "sourceMap" : true,  /*  <--------------- only to debug ts files */
+        "alwaysStrict" : true,
+        "declaration" : true,
+        "allowJs" : true,
+        "lib": [
+          "es2015",
+          "DOM"
+        ]
+        
+    },
+    "include": [
+        "./**/*.ts",
+        "./**/*.js"
+    ],
+    "exclude": [
+        "./out.js",
+        "./out.d.ts"
+    ]
+}
