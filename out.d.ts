@@ -37,6 +37,9 @@ declare module "processors" {
 declare module "00/flare" {
     export const flare: () => any;
 }
+declare module "00/lare" {
+    export const lare: () => any;
+}
 declare module "00/scope" {
     export const scope: (...args: any[]) => any;
 }

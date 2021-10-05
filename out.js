@@ -209,15 +209,46 @@ define("00/flare", ["require", "exports", "engine", "utils", "maps"], function (
     };
     var flare = function () { return utils_js_2.compose([
         engine_js_3.init(config),
+        engine_js_3.layer(30, colors, maps_2.constant(config, 30 * 20)),
         engine_js_3.layer(2, colors, maps_2.centerProximity(config)),
         engine_js_3.layer(2, colors, maps_2.centerProximity(config)),
         engine_js_3.layer(3, colors, maps_2.centerProximity(config)),
         engine_js_3.layer(5, colors, maps_2.centerProximity(config)),
+        engine_js_3.layer(7, colors, maps_2.centerProximity(config)),
         engine_js_3.render(config)
     ])(); };
     exports.flare = flare;
 });
-define("00/scope", ["require", "exports", "engine", "utils", "maps"], function (require, exports, engine_1, utils_1, maps_3) {
+define("00/lare", ["require", "exports", "engine", "utils", "maps"], function (require, exports, engine_js_4, utils_js_3, maps_3) {
+    "use strict";
+    exports.__esModule = true;
+    exports.lare = void 0;
+    var colors = ['green', 'blue', 'yellow'];
+    var config = {
+        pixelSize: 20,
+        width: 100,
+        height: 100
+    };
+    var cutLine = function (size, map) { return map.map(function (row, i) {
+        var regionSize = row.length / size;
+        if (i > regionSize && i < regionSize * (size - 1)) {
+            return row;
+        }
+        else {
+            return row.map(function () { return undefined; });
+        }
+    }); };
+    var lare = function () { return utils_js_3.compose([
+        engine_js_4.init(config),
+        engine_js_4.layer(1, colors, maps_3.constant(config, 10)),
+        engine_js_4.layer(2, colors, cutLine(6, maps_3.constant(config, 50))),
+        engine_js_4.layer(10, colors, cutLine(3, maps_3.constant(config, 30 * 20))),
+        engine_js_4.layer(5, colors, cutLine(4, maps_3.constant(config, 30 * 20))),
+        engine_js_4.render(config)
+    ])(); };
+    exports.lare = lare;
+});
+define("00/scope", ["require", "exports", "engine", "utils", "maps"], function (require, exports, engine_1, utils_1, maps_4) {
     "use strict";
     exports.__esModule = true;
     exports.scope = void 0;
@@ -234,18 +265,18 @@ define("00/scope", ["require", "exports", "engine", "utils", "maps"], function (
         }
         return utils_1.compose([
             engine_1.init(config),
-            engine_1.layer(60, colors, maps_3.verticalSymmetry(config, 100000)),
-            engine_1.layer(60, colors, maps_3.constant(config, 50000)),
-            engine_1.layer(10, colors, maps_3.verticalSymmetry(config, 3000)),
-            engine_1.layer(20, colors, maps_3.verticalSymmetry(config, 6000)),
-            engine_1.layer(2, colors, maps_3.verticalSymmetry(config, 100)),
-            engine_1.layer(1, colors, maps_3.constant(config, 10)),
+            engine_1.layer(60, colors, maps_4.verticalSymmetry(config, 100000)),
+            engine_1.layer(60, colors, maps_4.constant(config, 50000)),
+            engine_1.layer(10, colors, maps_4.verticalSymmetry(config, 3000)),
+            engine_1.layer(20, colors, maps_4.verticalSymmetry(config, 6000)),
+            engine_1.layer(2, colors, maps_4.verticalSymmetry(config, 100)),
+            engine_1.layer(1, colors, maps_4.constant(config, 10)),
             engine_1.render(config)
         ]).apply(void 0, args);
     };
     exports.scope = scope;
 });
-define("00/drope", ["require", "exports", "engine", "utils", "maps", "processors"], function (require, exports, engine_js_4, utils_js_3, maps_4, processors_1) {
+define("00/drope", ["require", "exports", "engine", "utils", "maps", "processors"], function (require, exports, engine_js_5, utils_js_4, maps_5, processors_1) {
     "use strict";
     exports.__esModule = true;
     exports.drope = void 0;
@@ -260,26 +291,27 @@ define("00/drope", ["require", "exports", "engine", "utils", "maps", "processors
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        return utils_js_3.compose([
-            engine_js_4.init(config),
-            engine_js_4.layer(2, colors, maps_4.cornerProximity(config)),
-            engine_js_4.layer(2, colors, maps_4.cornerProximity(config)),
-            engine_js_4.layer(10, colors, maps_4.symmetry(config, 3000)),
-            engine_js_4.layer(20, colors, maps_4.symmetry(config, 6000)),
+        return utils_js_4.compose([
+            engine_js_5.init(config),
+            engine_js_5.layer(2, colors, maps_5.cornerProximity(config, 0.1)),
+            engine_js_5.layer(3, colors, maps_5.cornerProximity(config, 0.1)),
+            engine_js_5.layer(10, colors, maps_5.symmetry(config, 5000)),
+            engine_js_5.layer(20, colors, maps_5.symmetry(config, 7000)),
+            engine_js_5.layer(30, colors, maps_5.centerProximity(config, 10)),
             processors_1.clearEveryNthLine(10),
-            engine_js_4.layer(30, colors, maps_4.centerProximity(config, 10)),
-            engine_js_4.render(config)
+            engine_js_5.render(config)
         ]).apply(void 0, args);
     };
     exports.drope = drope;
 });
-define("index", ["require", "exports", "00/film", "00/flare", "00/scope", "00/drope"], function (require, exports, film_js_1, flare_js_1, scope_js_1, drope_js_1) {
+define("index", ["require", "exports", "00/film", "00/flare", "00/lare", "00/scope", "00/drope"], function (require, exports, film_js_1, flare_js_1, lare_js_1, scope_js_1, drope_js_1) {
     "use strict";
     exports.__esModule = true;
-    Array(10).fill(1).map(function () { window.document.body.appendChild(drope_js_1.drope()); });
+    Array(10).fill(1).map(function () { window.document.body.appendChild(lare_js_1.lare()); });
     document.body.appendChild(scope_js_1.scope());
     document.body.appendChild(film_js_1.film());
     document.body.appendChild(flare_js_1.flare());
+    document.body.appendChild(drope_js_1.drope());
 });
 var requirejs, require, define;
 (function (global, setTimeout) {

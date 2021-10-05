@@ -15,10 +15,13 @@ const config = {
 export const flare = () => compose([
   init(config),
 
+  layer(30, colors, constant(config, 30 * 20)),
+
   layer(2, colors, centerProximity(config)),
   layer(2, colors, centerProximity(config)),
   layer(3, colors, centerProximity(config)),
   layer(5, colors, centerProximity(config)),
+  layer(7, colors, centerProximity(config)),
 
   render(config)
 ])()
