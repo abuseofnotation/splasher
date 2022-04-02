@@ -1,4 +1,4 @@
-import { layer, render, intensityMap, init, random} from './engine.js'
+import { splasher, render, intensityMap, init, random} from './engine.js'
 import { compose, rCompose, printMap} from './utils.js'
 
 const centerProximityFn = (intensity) => (x, y) => {

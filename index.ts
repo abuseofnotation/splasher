@@ -1,16 +1,31 @@
-import { layer, render, intensityMap, init, random } from './engine.js'
-import { rCompose, constant, printMap} from './utils.js'
-import { film } from './00/film.js'
-import { flare } from './00/flare.js'
-import { lare } from './00/lare.js'
-import { scope } from './00/scope.js'
-import { drope } from './00/drope.js'
+import { splasher, render, intensityMap, init, random, fillCanvas } from './engine.js'
 
+import * as maps from './maps' 
 
-Array(10).fill(1).map(() => { window.document.body.appendChild(lare()) })
+const renderStuff = () => {
+  Array.prototype.slice.call(document.getElementsByClassName('art')).forEach((canvas) => {
+    const config = Object.assign({}, canvas.dataset)
+    config.width = canvas.width
+    config.height = canvas.height
+    config.colors = config.colors.split(',')
+    config.pixelSize = parseInt(config.pixel)
+    
+    let grid = init(config)()
+    Array.prototype.slice.call(canvas.children).forEach((layer) => {
+        grid = layerFillers[layer.localName](layer.dataset, config)(grid)
+    })
+    fillCanvas(canvas, config, grid)
+  })
+  
+}
 
-document.body.appendChild(scope())
-document.body.appendChild(film())
-document.body.appendChild(flare())
-document.body.appendChild(drope())
+const layerFillers = {
+  splasher: ({size, colors, map, params}, config) => 
+    splasher(parseInt(size), colors || config.colors, maps[map](config, parseFloat(params))),
+}
 
+if (document.readyState === "complete" || document.readyState === "interactive") {
+  renderStuff()
+} else {
+  document.addEventListener("DOMContentLoaded", renderStuff)
+}

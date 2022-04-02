@@ -7,6 +7,17 @@
 
 </head>
 <body id="home">
+
+<div class="drope"></div>
+
+<canvas class="art" width="200x", height="200px" data-pixel="1" data-colors="blue,green,yellow">
+  <splasher data-size="2" data-map="cornerProximity" data-params="0.1"></splasher>
+  <splasher data-size="3" data-map="cornerProximity" data-params="0.1"></splasher>
+  <splasher data-size="10" data-map="symmetry" data-params="5000"></splasher>
+  <splasher data-size="20" data-map="symmetry" data-params="7000"></splasher>
+  <splasher data-size="30" data-map="centerProximity" data-params="10"></splasher>
+</canvas>
+
 </body>
 <script src="require.js"></script>
 <script src="out.js"></script>

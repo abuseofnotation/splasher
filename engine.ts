@@ -6,13 +6,15 @@ const getRandomInt = (max) => {
 
 const pick = (options) => options[getRandomInt(options.length)];
 
-export const render = ({pixelSize}) => (grid) => {
-
+export const createCanvas= (grid, {pixelSize}) => { 
   const canvas = document.createElement('canvas')
   canvas.width = grid.length * pixelSize
   canvas.height = grid[0].length * pixelSize
   canvas.style.margin = pixelSize * 20 + 'px'
+  return canvas;
+}
 
+export const fillCanvas = (canvas, {pixelSize}, grid) => {
   const context = canvas.getContext('2d');
   grid.forEach((row, verticalIndex) => {
     row.forEach((blockColor, horizontalIndex) => {
@@ -33,7 +35,10 @@ export const render = ({pixelSize}) => (grid) => {
     });
   });
   return canvas
-};
+}
+
+export const render = (config) => (grid) => 
+  fillCanvas(createCanvas(grid, config), config, grid)
 
 export const intensityMap = ({width, height}) => (intensityFn) => 
   Array(width).fill(1).map((_, x) => Array(height).fill(1).map((_, y) => intensityFn(x, y)))
@@ -75,7 +80,7 @@ console.log(printArray(arr))
 
 */
 
-export const layer = (size, colors, intensityMap) => (canvas) => {
+export const splasher = (size, colors, intensityMap) => (canvas) => {
   intensityMap
   .forEach((row, x) => row.forEach((cellIntensity, y) => {
     if (random(cellIntensity)) {

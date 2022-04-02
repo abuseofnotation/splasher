@@ -1,4 +1,4 @@
-import { layer, render, intensityMap, init, random} from '../engine.js'
+import { splasher, render, intensityMap, init, random} from '../engine.js'
 import { compose, rCompose, printMap} from '../utils.js'
 import { symmetry, horizontalSymmetry, verticalSymmetry, constant, centerProximity, cornerProximity} from '../maps'
 
@@ -24,10 +24,10 @@ const cutLine = (size, map) => map.map((row, i) => {
 export const lare = () => compose([
   init(config),
 
-  layer(1, colors, constant(config, 10)),
-  layer(2, colors, cutLine(6, constant(config, 50))),
-  layer(10, colors, cutLine(3, constant(config, 30 * 20))),
-  layer(5, colors, cutLine(4, constant(config, 30 * 20))),
+  splasher(1, colors, constant(config, 10)),
+  splasher(2, colors, cutLine(6, constant(config, 50))),
+  splasher(10, colors, cutLine(3, constant(config, 30 * 20))),
+  splasher(5, colors, cutLine(4, constant(config, 30 * 20))),
 
   render(config)
 ])()

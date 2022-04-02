@@ -1,4 +1,4 @@
-import { layer, render, intensityMap, init, random} from '../engine.js'
+import { splasher, render, intensityMap, init, random} from '../engine.js'
 import { compose, rCompose, printMap} from '../utils.js'
 
 import { horizontalSymmetry, verticalSymmetry, constant, centerProximity} from '../maps'
@@ -13,8 +13,8 @@ const config = {
 
 export const film = compose([
   init(config),
-  layer(1, colors, constant(config, 1)),
-  layer(10, colors, constant(config, 10000)),
-  layer(50, colors, constant(config, 10000)),
+  splasher(1, colors, constant(config, 1)),
+  splasher(10, colors, constant(config, 10000)),
+  splasher(50, colors, constant(config, 10000)),
   render(config)
 ])
