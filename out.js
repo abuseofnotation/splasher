@@ -1,4 +1,5 @@
 "use strict";
+console.log('hello');
 define("utils", ["require", "exports"], function (require, exports) {
     "use strict";
     exports.__esModule = true;
@@ -26,26 +27,35 @@ define("utils", ["require", "exports"], function (require, exports) {
     var constant = function (a) { return function () { return a; }; };
     exports.constant = constant;
 });
-define("engine", ["require", "exports"], function (require, exports) {
+define("lib", ["require", "exports"], function (require, exports) {
     "use strict";
     exports.__esModule = true;
-    exports.init = exports.splasher = exports.random = exports.intensityMap = exports.render = exports.fillCanvas = exports.createCanvas = void 0;
+    exports.fillCanvas = exports.init = exports.pick = exports.intensityMap = exports.random = void 0;
+    var random = function (intensity) { return getRandomInt(intensity) + 1 === intensity; };
+    exports.random = random;
+    var intensityMap = function (_a) {
+        var width = _a.width, height = _a.height;
+        return function (intensityFn) {
+            return Array(width).fill(1).map(function (_, x) { return Array(height).fill(1).map(function (_, y) { return intensityFn(x, y); }); });
+        };
+    };
+    exports.intensityMap = intensityMap;
     var getRandomInt = function (max) {
         return Math.floor(Math.random() * Math.floor(max));
     };
     var pick = function (options) { return options[getRandomInt(options.length)]; };
-    var createCanvas = function (grid, _a) {
-        var pixelSize = _a.pixelSize;
-        var canvas = document.createElement('canvas');
-        canvas.width = grid.length * pixelSize;
-        canvas.height = grid[0].length * pixelSize;
-        canvas.style.margin = pixelSize * 20 + 'px';
-        return canvas;
+    exports.pick = pick;
+    var init = function (_a) {
+        var width = _a.width, height = _a.height;
+        return function () {
+            return (0, exports.intensityMap)({ width: width, height: height })(function () { return undefined; });
+        };
     };
-    exports.createCanvas = createCanvas;
+    exports.init = init;
     var fillCanvas = function (canvas, _a, grid) {
         var pixelSize = _a.pixelSize;
         var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
         grid.forEach(function (row, verticalIndex) {
             row.forEach(function (blockColor, horizontalIndex) {
                 if (blockColor) {
@@ -59,51 +69,19 @@ define("engine", ["require", "exports"], function (require, exports) {
         return canvas;
     };
     exports.fillCanvas = fillCanvas;
-    var render = function (config) { return function (grid) {
-        return (0, exports.fillCanvas)((0, exports.createCanvas)(grid, config), config, grid);
-    }; };
-    exports.render = render;
-    var intensityMap = function (_a) {
-        var width = _a.width, height = _a.height;
-        return function (intensityFn) {
-            return Array(width).fill(1).map(function (_, x) { return Array(height).fill(1).map(function (_, y) { return intensityFn(x, y); }); });
-        };
-    };
-    exports.intensityMap = intensityMap;
-    var random = function (intensity) { return getRandomInt(intensity) + 1 === intensity; };
-    exports.random = random;
-    var splashSpot = function (canvas, x, y, color, size) {
-        if (size === void 0) { size = 3; }
-        var indexInRange = function (i, y) { return (i > (y - size)) && (i < (y + size)); };
-        canvas.forEach(function (row, i) {
-            if (indexInRange(i, x)) {
-                row.forEach(function (_, i) {
-                    if (indexInRange(i, y)) {
-                        row[i] = color;
-                    }
-                });
-            }
-        });
-    };
-    var splasher = function (size, colors, intensityMap) { return function (canvas) {
-        intensityMap
-            .forEach(function (row, x) { return row.forEach(function (cellIntensity, y) {
-            if ((0, exports.random)(cellIntensity)) {
-                splashSpot(canvas, x, y, pick(colors), size);
-            }
-        }); });
+    var createCanvas = function (grid, _a) {
+        var pixelSize = _a.pixelSize;
+        var canvas = document.createElement('canvas');
+        canvas.width = grid.length * pixelSize;
+        canvas.height = grid[0].length * pixelSize;
+        canvas.style.margin = pixelSize * 20 + 'px';
         return canvas;
-    }; };
-    exports.splasher = splasher;
-    var init = function (_a) {
-        var width = _a.width, height = _a.height;
-        return function () {
-            return (0, exports.intensityMap)({ width: width, height: height })(function () { return undefined; });
-        };
     };
-    exports.init = init;
+    var render = function (config) { return function (grid) {
+        return (0, exports.fillCanvas)(createCanvas(grid, config), config, grid);
+    }; };
 });
-define("maps", ["require", "exports", "engine"], function (require, exports, engine_js_1) {
+define("maps", ["require", "exports", "lib"], function (require, exports, lib_js_1) {
     "use strict";
     exports.__esModule = true;
     exports.constant = exports.symmetry = exports.verticalSymmetry = exports.horizontalSymmetry = exports.cornerProximity = exports.centerProximity = void 0;
@@ -114,7 +92,7 @@ define("maps", ["require", "exports", "engine"], function (require, exports, eng
     }; };
     var centerProximity = function (config, intensity) {
         if (intensity === void 0) { intensity = 1; }
-        return (0, engine_js_1.intensityMap)(config)(centerProximityFn(intensity));
+        return (0, lib_js_1.intensityMap)(config)(centerProximityFn(intensity));
     };
     exports.centerProximity = centerProximity;
     var cornerDistance = function (x) { return x < ((1000 / 5) - x) ? x : ((1000 / 5) - x); };
@@ -128,7 +106,7 @@ define("maps", ["require", "exports", "engine"], function (require, exports, eng
     };
     var cornerProximity = function (config, intensity) {
         if (intensity === void 0) { intensity = 2; }
-        return (0, engine_js_1.intensityMap)(config)(cornerProximityFn(config, intensity));
+        return (0, lib_js_1.intensityMap)(config)(cornerProximityFn(config, intensity));
     };
     exports.cornerProximity = cornerProximity;
     var createSymmetry = function (map) { return map.map(function (row, i) {
@@ -141,50 +119,122 @@ define("maps", ["require", "exports", "engine"], function (require, exports, eng
     }); };
     var horizontalSymmetry = function (config, intensity) {
         if (intensity === void 0) { intensity = 2000; }
-        var map = (0, engine_js_1.intensityMap)(config)(function () { return (0, engine_js_1.random)(intensity) ? 2 : undefined; });
+        var map = (0, lib_js_1.intensityMap)(config)(function () { return (0, lib_js_1.random)(intensity) ? 2 : undefined; });
         return createSymmetry(map);
     };
     exports.horizontalSymmetry = horizontalSymmetry;
     var verticalSymmetry = function (config, intensity) {
         if (intensity === void 0) { intensity = 2000; }
-        var map = (0, engine_js_1.intensityMap)(config)(function () { return (0, engine_js_1.random)(intensity) ? 1 : undefined; });
+        var map = (0, lib_js_1.intensityMap)(config)(function () { return (0, lib_js_1.random)(intensity) ? 1 : undefined; });
         return map.map(createSymmetry);
     };
     exports.verticalSymmetry = verticalSymmetry;
     var symmetry = function (config, intensity) {
         if (intensity === void 0) { intensity = 2000; }
-        var map = (0, engine_js_1.intensityMap)(config)(function () { return (0, engine_js_1.random)(intensity) ? 1 : undefined; });
+        var map = (0, lib_js_1.intensityMap)(config)(function () { return (0, lib_js_1.random)(intensity) ? 1 : undefined; });
         return createSymmetry(map).map(createSymmetry);
     };
     exports.symmetry = symmetry;
     var constant = function (config, intensity) {
         if (intensity === void 0) { intensity = 2000; }
-        return (0, engine_js_1.intensityMap)(config)(function () { return intensity; });
+        return (0, lib_js_1.intensityMap)(config)(function () { return intensity; });
     };
     exports.constant = constant;
 });
-define("index", ["require", "exports", "engine", "maps"], function (require, exports, engine_js_2, maps) {
+define("fillers", ["require", "exports", "lib", "maps"], function (require, exports, lib_js_2, maps) {
+    "use strict";
+    exports.__esModule = true;
+    exports.plasher = exports.splasher = void 0;
+    var splashSpot = function (canvas, x, y, color, size) {
+        if (size === void 0) { size = 3; }
+        var indexInRange = function (i, y) { return (i > (y - size)) && (i < (y + size)); };
+        canvas.forEach(function (row, i) {
+            if (indexInRange(i, x)) {
+                row.forEach(function (_, i) {
+                    if (indexInRange(i, y)) {
+                        row[i] = color;
+                    }
+                });
+            }
+        });
+    };
+    var empty = function (canvas, x, y, color, size) {
+        if (size === void 0) { size = 3; }
+        var empty = true;
+        var indexInRange = function (i, y) { return (i > (y - size)) && (i < (y + size)); };
+        canvas.forEach(function (row, i) {
+            if (indexInRange(i, x)) {
+                row.forEach(function (_, i) {
+                    if (indexInRange(i, y)) {
+                        if (row[i] !== undefined) {
+                            empty = false;
+                        }
+                    }
+                });
+            }
+        });
+        return empty;
+    };
+    var verify = function (filler) { return function (_a, config, canvas) {
+        var size = _a.size, colors = _a.colors, map = _a.map, params = _a.params;
+        var theColors = (colors || config.colors).split(',');
+        var mapFn = maps[map];
+        if (mapFn === undefined) {
+            throw "Undefined map - ".concat(map);
+        }
+        else {
+            return filler({ size: size, colors: theColors, map: mapFn(config, parseFloat(params)) }, config, canvas);
+        }
+    }; };
+    exports.splasher = verify(function (_a, config, canvas) {
+        var size = _a.size, colors = _a.colors, map = _a.map;
+        map
+            .forEach(function (row, x) { return row.forEach(function (cellIntensity, y) {
+            if ((0, lib_js_2.random)(cellIntensity)) {
+                splashSpot(canvas, x, y, (0, lib_js_2.pick)(colors || config.colors), parseInt(size));
+            }
+        }); });
+        return canvas;
+    });
+    exports.plasher = verify(function (_a, config, canvas) {
+        var size = _a.size, colors = _a.colors, map = _a.map;
+        map
+            .forEach(function (row, x) { return row.forEach(function (cellIntensity, y) {
+            if ((0, lib_js_2.random)(cellIntensity)) {
+                if (empty(canvas, x, y, (0, lib_js_2.pick)(colors || config.colors), parseInt(size))) {
+                    splashSpot(canvas, x, y, (0, lib_js_2.pick)(colors || config.colors), parseInt(size));
+                }
+            }
+        }); });
+        return canvas;
+    });
+});
+define("render", ["require", "exports", "lib", "fillers"], function (require, exports, lib_1, fillers) {
+    "use strict";
+    exports.__esModule = true;
+    exports.render = void 0;
+    var render = function (canvas) {
+        var config = Object.assign({}, canvas.dataset);
+        config.width = canvas.width;
+        config.height = canvas.height;
+        config.pixelSize = parseInt(config.pixel);
+        var grid = (0, lib_1.init)(config)();
+        Array.prototype.slice.call(canvas.children).forEach(function (layer) {
+            grid = fillers[layer.localName](layer.dataset, config, grid);
+        });
+        (0, lib_1.fillCanvas)(canvas, config, grid);
+    };
+    exports.render = render;
+});
+define("index", ["require", "exports", "render"], function (require, exports, render_1) {
     "use strict";
     exports.__esModule = true;
     var renderStuff = function () {
         Array.prototype.slice.call(document.getElementsByClassName('art')).forEach(function (canvas) {
-            var config = Object.assign({}, canvas.dataset);
-            config.width = canvas.width;
-            config.height = canvas.height;
-            config.colors = config.colors.split(',');
-            config.pixelSize = parseInt(config.pixel);
-            var grid = (0, engine_js_2.init)(config)();
-            Array.prototype.slice.call(canvas.children).forEach(function (layer) {
-                grid = layerFillers[layer.localName](layer.dataset, config)(grid);
-            });
-            (0, engine_js_2.fillCanvas)(canvas, config, grid);
+            console.log(canvas.dataset);
+            (0, render_1.render)(canvas);
+            setInterval(function () { return (0, render_1.render)(canvas); }, parseInt(canvas.dataset.repeat));
         });
-    };
-    var layerFillers = {
-        splasher: function (_a, config) {
-            var size = _a.size, colors = _a.colors, map = _a.map, params = _a.params;
-            return (0, engine_js_2.splasher)(parseInt(size), colors || config.colors, maps[map](config, parseFloat(params)));
-        }
     };
     if (document.readyState === "complete" || document.readyState === "interactive") {
         renderStuff();
@@ -215,131 +265,6 @@ define("processors", ["require", "exports"], function (require, exports) {
         }
     }); }; };
     exports.clearEveryNthLine = clearEveryNthLine;
-});
-define("00/drope", ["require", "exports", "engine", "utils", "maps", "processors"], function (require, exports, engine_js_3, utils_js_1, maps_1, processors_1) {
-    "use strict";
-    exports.__esModule = true;
-    exports.drope = void 0;
-    var colors = ['green', 'blue', 'yellow'];
-    var config = {
-        pixelSize: 1,
-        width: 200,
-        height: 200
-    };
-    var drope = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        return (0, utils_js_1.compose)([
-            (0, engine_js_3.init)(config),
-            (0, engine_js_3.splasher)(2, colors, (0, maps_1.cornerProximity)(config, 0.1)),
-            (0, engine_js_3.splasher)(3, colors, (0, maps_1.cornerProximity)(config, 0.1)),
-            (0, engine_js_3.splasher)(10, colors, (0, maps_1.symmetry)(config, 5000)),
-            (0, engine_js_3.splasher)(20, colors, (0, maps_1.symmetry)(config, 7000)),
-            (0, engine_js_3.splasher)(30, colors, (0, maps_1.centerProximity)(config, 10)),
-            (0, processors_1.clearEveryNthLine)(10),
-            (0, engine_js_3.render)(config)
-        ]).apply(void 0, args);
-    };
-    exports.drope = drope;
-});
-define("00/film", ["require", "exports", "engine", "utils", "maps"], function (require, exports, engine_js_4, utils_js_2, maps_2) {
-    "use strict";
-    exports.__esModule = true;
-    exports.film = void 0;
-    var colors = ['green', 'blue', 'yellow', 'white'];
-    var config = {
-        pixelSize: 10,
-        width: 200,
-        height: 200
-    };
-    exports.film = (0, utils_js_2.compose)([
-        (0, engine_js_4.init)(config),
-        (0, engine_js_4.splasher)(1, colors, (0, maps_2.constant)(config, 1)),
-        (0, engine_js_4.splasher)(10, colors, (0, maps_2.constant)(config, 10000)),
-        (0, engine_js_4.splasher)(50, colors, (0, maps_2.constant)(config, 10000)),
-        (0, engine_js_4.render)(config)
-    ]);
-});
-define("00/flare", ["require", "exports", "engine", "utils", "maps"], function (require, exports, engine_js_5, utils_js_3, maps_3) {
-    "use strict";
-    exports.__esModule = true;
-    exports.flare = void 0;
-    var colors = ['green', 'blue', 'yellow'];
-    var config = {
-        pixelSize: 10,
-        width: 200,
-        height: 200
-    };
-    var flare = function () { return (0, utils_js_3.compose)([
-        (0, engine_js_5.init)(config),
-        (0, engine_js_5.splasher)(30, colors, (0, maps_3.constant)(config, 30 * 20)),
-        (0, engine_js_5.splasher)(2, colors, (0, maps_3.centerProximity)(config)),
-        (0, engine_js_5.splasher)(2, colors, (0, maps_3.centerProximity)(config)),
-        (0, engine_js_5.splasher)(3, colors, (0, maps_3.centerProximity)(config)),
-        (0, engine_js_5.splasher)(5, colors, (0, maps_3.centerProximity)(config)),
-        (0, engine_js_5.splasher)(7, colors, (0, maps_3.centerProximity)(config)),
-        (0, engine_js_5.render)(config)
-    ])(); };
-    exports.flare = flare;
-});
-define("00/lare", ["require", "exports", "engine", "utils", "maps"], function (require, exports, engine_js_6, utils_js_4, maps_4) {
-    "use strict";
-    exports.__esModule = true;
-    exports.lare = void 0;
-    var colors = ['green', 'blue', 'yellow'];
-    var config = {
-        pixelSize: 20,
-        width: 100,
-        height: 100
-    };
-    var cutLine = function (size, map) { return map.map(function (row, i) {
-        var regionSize = row.length / size;
-        if (i > regionSize && i < regionSize * (size - 1)) {
-            return row;
-        }
-        else {
-            return row.map(function () { return undefined; });
-        }
-    }); };
-    var lare = function () { return (0, utils_js_4.compose)([
-        (0, engine_js_6.init)(config),
-        (0, engine_js_6.splasher)(1, colors, (0, maps_4.constant)(config, 10)),
-        (0, engine_js_6.splasher)(2, colors, cutLine(6, (0, maps_4.constant)(config, 50))),
-        (0, engine_js_6.splasher)(10, colors, cutLine(3, (0, maps_4.constant)(config, 30 * 20))),
-        (0, engine_js_6.splasher)(5, colors, cutLine(4, (0, maps_4.constant)(config, 30 * 20))),
-        (0, engine_js_6.render)(config)
-    ])(); };
-    exports.lare = lare;
-});
-define("00/scope", ["require", "exports", "engine", "utils", "maps"], function (require, exports, engine_1, utils_1, maps_5) {
-    "use strict";
-    exports.__esModule = true;
-    exports.scope = void 0;
-    var colors = ['green', 'blue', 'yellow'];
-    var config = {
-        pixelSize: 10,
-        width: 200,
-        height: 200
-    };
-    var scope = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        return (0, utils_1.compose)([
-            (0, engine_1.init)(config),
-            (0, engine_1.splasher)(60, colors, (0, maps_5.verticalSymmetry)(config, 100000)),
-            (0, engine_1.splasher)(60, colors, (0, maps_5.constant)(config, 50000)),
-            (0, engine_1.splasher)(10, colors, (0, maps_5.verticalSymmetry)(config, 3000)),
-            (0, engine_1.splasher)(20, colors, (0, maps_5.verticalSymmetry)(config, 6000)),
-            (0, engine_1.splasher)(2, colors, (0, maps_5.verticalSymmetry)(config, 100)),
-            (0, engine_1.splasher)(1, colors, (0, maps_5.constant)(config, 10)),
-            (0, engine_1.render)(config)
-        ]).apply(void 0, args);
-    };
-    exports.scope = scope;
 });
 var requirejs, require, define;
 (function (global, setTimeout) {
@@ -1598,4 +1523,129 @@ var requirejs, require, define;
     };
     req(cfg);
 }(this, (typeof setTimeout === 'undefined' ? undefined : setTimeout)));
+define("00/drope", ["require", "exports", "../engine.js", "utils", "maps", "processors"], function (require, exports, engine_js_1, utils_js_1, maps_1, processors_1) {
+    "use strict";
+    exports.__esModule = true;
+    exports.drope = void 0;
+    var colors = ['green', 'blue', 'yellow'];
+    var config = {
+        pixelSize: 1,
+        width: 200,
+        height: 200
+    };
+    var drope = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        return (0, utils_js_1.compose)([
+            (0, engine_js_1.init)(config),
+            (0, engine_js_1.splasher)(2, colors, (0, maps_1.cornerProximity)(config, 0.1)),
+            (0, engine_js_1.splasher)(3, colors, (0, maps_1.cornerProximity)(config, 0.1)),
+            (0, engine_js_1.splasher)(10, colors, (0, maps_1.symmetry)(config, 5000)),
+            (0, engine_js_1.splasher)(20, colors, (0, maps_1.symmetry)(config, 7000)),
+            (0, engine_js_1.splasher)(30, colors, (0, maps_1.centerProximity)(config, 10)),
+            (0, processors_1.clearEveryNthLine)(10),
+            (0, engine_js_1.render)(config)
+        ]).apply(void 0, args);
+    };
+    exports.drope = drope;
+});
+define("00/film", ["require", "exports", "../engine.js", "utils", "maps"], function (require, exports, engine_js_2, utils_js_2, maps_2) {
+    "use strict";
+    exports.__esModule = true;
+    exports.film = void 0;
+    var colors = ['green', 'blue', 'yellow', 'white'];
+    var config = {
+        pixelSize: 10,
+        width: 200,
+        height: 200
+    };
+    exports.film = (0, utils_js_2.compose)([
+        (0, engine_js_2.init)(config),
+        (0, engine_js_2.splasher)(1, colors, (0, maps_2.constant)(config, 1)),
+        (0, engine_js_2.splasher)(10, colors, (0, maps_2.constant)(config, 10000)),
+        (0, engine_js_2.splasher)(50, colors, (0, maps_2.constant)(config, 10000)),
+        (0, engine_js_2.render)(config)
+    ]);
+});
+define("00/flare", ["require", "exports", "../engine.js", "utils", "maps"], function (require, exports, engine_js_3, utils_js_3, maps_3) {
+    "use strict";
+    exports.__esModule = true;
+    exports.flare = void 0;
+    var colors = ['green', 'blue', 'yellow'];
+    var config = {
+        pixelSize: 10,
+        width: 200,
+        height: 200
+    };
+    var flare = function () { return (0, utils_js_3.compose)([
+        (0, engine_js_3.init)(config),
+        (0, engine_js_3.splasher)(30, colors, (0, maps_3.constant)(config, 30 * 20)),
+        (0, engine_js_3.splasher)(2, colors, (0, maps_3.centerProximity)(config)),
+        (0, engine_js_3.splasher)(2, colors, (0, maps_3.centerProximity)(config)),
+        (0, engine_js_3.splasher)(3, colors, (0, maps_3.centerProximity)(config)),
+        (0, engine_js_3.splasher)(5, colors, (0, maps_3.centerProximity)(config)),
+        (0, engine_js_3.splasher)(7, colors, (0, maps_3.centerProximity)(config)),
+        (0, engine_js_3.render)(config)
+    ])(); };
+    exports.flare = flare;
+});
+define("00/lare", ["require", "exports", "../engine.js", "utils", "maps"], function (require, exports, engine_js_4, utils_js_4, maps_4) {
+    "use strict";
+    exports.__esModule = true;
+    exports.lare = void 0;
+    var colors = ['green', 'blue', 'yellow'];
+    var config = {
+        pixelSize: 20,
+        width: 100,
+        height: 100
+    };
+    var cutLine = function (size, map) { return map.map(function (row, i) {
+        var regionSize = row.length / size;
+        if (i > regionSize && i < regionSize * (size - 1)) {
+            return row;
+        }
+        else {
+            return row.map(function () { return undefined; });
+        }
+    }); };
+    var lare = function () { return (0, utils_js_4.compose)([
+        (0, engine_js_4.init)(config),
+        (0, engine_js_4.splasher)(1, colors, (0, maps_4.constant)(config, 10)),
+        (0, engine_js_4.splasher)(2, colors, cutLine(6, (0, maps_4.constant)(config, 50))),
+        (0, engine_js_4.splasher)(10, colors, cutLine(3, (0, maps_4.constant)(config, 30 * 20))),
+        (0, engine_js_4.splasher)(5, colors, cutLine(4, (0, maps_4.constant)(config, 30 * 20))),
+        (0, engine_js_4.render)(config)
+    ])(); };
+    exports.lare = lare;
+});
+define("00/scope", ["require", "exports", "../engine", "utils", "maps"], function (require, exports, engine_1, utils_1, maps_5) {
+    "use strict";
+    exports.__esModule = true;
+    exports.scope = void 0;
+    var colors = ['green', 'blue', 'yellow'];
+    var config = {
+        pixelSize: 10,
+        width: 200,
+        height: 200
+    };
+    var scope = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        return (0, utils_1.compose)([
+            (0, engine_1.init)(config),
+            (0, engine_1.splasher)(60, colors, (0, maps_5.verticalSymmetry)(config, 100000)),
+            (0, engine_1.splasher)(60, colors, (0, maps_5.constant)(config, 50000)),
+            (0, engine_1.splasher)(10, colors, (0, maps_5.verticalSymmetry)(config, 3000)),
+            (0, engine_1.splasher)(20, colors, (0, maps_5.verticalSymmetry)(config, 6000)),
+            (0, engine_1.splasher)(2, colors, (0, maps_5.verticalSymmetry)(config, 100)),
+            (0, engine_1.splasher)(1, colors, (0, maps_5.constant)(config, 10)),
+            (0, engine_1.render)(config)
+        ]).apply(void 0, args);
+    };
+    exports.scope = scope;
+});
 //# sourceMappingURL=out.js.map

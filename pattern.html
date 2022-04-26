@@ -8,14 +8,30 @@
 </head>
 <body id="home">
 
-<div class="drope"></div>
 
-<canvas class="art" width="200x", height="200px" data-pixel="1" data-colors="blue,green,yellow">
+<canvas class="art" width="200x", height="200px" data-pixel="1" data-colors="blue,green,yellow" data-repeat="1000">
   <splasher data-size="2" data-map="cornerProximity" data-params="0.1"></splasher>
   <splasher data-size="3" data-map="cornerProximity" data-params="0.1"></splasher>
   <splasher data-size="10" data-map="symmetry" data-params="5000"></splasher>
   <splasher data-size="20" data-map="symmetry" data-params="7000"></splasher>
   <splasher data-size="30" data-map="centerProximity" data-params="10"></splasher>
+</canvas>
+
+<canvas class="art" width="200px", height="200px" data-pixel="1" data-colors="blue,green,grey" data-repeat="2000">
+  <plasher data-size="50" data-map="constant" data-params="20000"></plasher>
+  <plasher data-size="20" data-map="constant" data-params="1000"></plasher>
+  <plasher data-size="10" data-map="constant" data-params="5"></plasher>
+  <plasher data-size="5" data-map="constant" data-params="5"></plasher>
+  <plasher data-size="2" data-map="constant" data-params="5"></plasher>
+  <plasher data-size="1" data-map="constant" data-params="5"></plasher>
+</canvas>
+
+<canvas class="art" width="200px", height="200px" data-pixel="1" data-colors="green,grey" data-repeat="3000">
+  <plasher data-size="30" data-map="symmetry" data-params="600" data-colors="black, red"></splasher>
+  <plasher data-size="10" data-map="centerProximity" data-params="1"></plasher>
+  <plasher data-size="10" data-map="constant" data-params="10"></plasher>
+  <plasher data-size="2" data-map="symmetry" data-params="70"></plasher>
+  <plasher data-size="1" data-map="symmetry" data-params="10"></plasher>
 </canvas>
 
 </body>
