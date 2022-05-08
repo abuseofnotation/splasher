@@ -3,9 +3,12 @@ import * as fillers from './fillers'
 
 export const render = (canvas) => {
     const config = Object.assign({}, canvas.dataset)
-    config.width = canvas.width
-    config.height = canvas.height
     config.pixelSize = parseInt(config.pixel)
+    console.log(canvas.width, canvas.height)
+    config.width = parseInt(canvas.width)/config.pixelSize
+    config.height = parseInt(canvas.height)/config.pixelSize
+
+    console.log(config)
     
     let grid = init(config)()
     Array.prototype.slice.call(canvas.children).forEach((layer) => {

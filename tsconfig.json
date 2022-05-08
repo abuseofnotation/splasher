@@ -3,7 +3,8 @@
     "compilerOptions" : {
         "module" : "amd",  /*  <----------------- REQUIRED  */
         "removeComments" : true,
-        "outFile" : "./out.js",  /*  <----------- REQUIRED  */
+        // "outFile" : "./out.js",  /*  <----------- REQUIRED  */
+        "outFile" : "../thoughts-of-x/assets/out.js",  /*  <----------- REQUIRED  */
         "baseUrl" : "./",
         "sourceMap" : true,  /*  <--------------- only to debug ts files */
         "alwaysStrict" : true,

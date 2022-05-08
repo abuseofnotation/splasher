@@ -233,7 +233,9 @@ define("index", ["require", "exports", "render"], function (require, exports, re
         Array.prototype.slice.call(document.getElementsByClassName('art')).forEach(function (canvas) {
             console.log(canvas.dataset);
             (0, render_1.render)(canvas);
-            setInterval(function () { return (0, render_1.render)(canvas); }, parseInt(canvas.dataset.repeat));
+            if (canvas.dataset.repeat) {
+                setInterval(function () { return (0, render_1.render)(canvas); }, parseInt(canvas.dataset.repeat));
+            }
         });
     };
     if (document.readyState === "complete" || document.readyState === "interactive") {

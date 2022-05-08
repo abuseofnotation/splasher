@@ -1,0 +1,8 @@
+--watch
+vim 00
+jekyll serve
+cd ~/pr/art
+tsc --watch
+vim 00
+jekyll serve
+

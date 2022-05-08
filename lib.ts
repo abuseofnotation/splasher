@@ -19,20 +19,23 @@ export const fillCanvas = (canvas, {pixelSize}, grid) => {
   // Clear any previously-drawn figures
   context.clearRect(0, 0, canvas.width, canvas.height);
 
+  console.log(grid)
   //Apply each layer
-  grid.forEach((row, verticalIndex) => {
-    row.forEach((blockColor, horizontalIndex) => {
+  console.log("Rendering grid", grid)
+  grid.forEach((row, horizontalIndex) => {
+    row.forEach((blockColor, verticalIndex) => {
       if (blockColor) {
+        //console.log('fill', horizontalIndex, verticalIndex)
         const width = horizontalIndex * pixelSize;
-        const heigth = verticalIndex * pixelSize;
+        const height = verticalIndex * pixelSize;
 
         context.fillStyle = blockColor;
-        context.fillRect(width, heigth, pixelSize, pixelSize);
+        context.fillRect(width, height, pixelSize, pixelSize);
 
 
         //canvas.beginPath();
         //canvas.fillStyle = blockColor;
-        //canvas.arc(width, heigth, size/2 , 0, 2 * Math.PI);
+        //canvas.arc(width, height, size/2 , 0, 2 * Math.PI);
         //canvas.fill(1);
       }
 
