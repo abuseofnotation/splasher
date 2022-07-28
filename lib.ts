@@ -4,7 +4,7 @@ export const random = (intensity) => getRandomInt(intensity) + 1 === intensity
 export const intensityMap = ({width, height}) => (intensityFn) => 
   Array(width).fill(1).map((_, x) => Array(height).fill(1).map((_, y) => intensityFn(x, y)))
 
-const getRandomInt = (max) => {
+export const getRandomInt = (max) => {
   return Math.floor(Math.random() * Math.floor(max));
 }
 
@@ -19,12 +19,11 @@ export const fillCanvas = (canvas, {pixelSize}, grid) => {
   // Clear any previously-drawn figures
   context.clearRect(0, 0, canvas.width, canvas.height);
 
-  console.log(grid)
-  //Apply each layer
   console.log("Rendering grid", grid)
   grid.forEach((row, horizontalIndex) => {
     row.forEach((blockColor, verticalIndex) => {
       if (blockColor) {
+        //setTimeout(() => {
         //console.log('fill', horizontalIndex, verticalIndex)
         const width = horizontalIndex * pixelSize;
         const height = verticalIndex * pixelSize;
@@ -37,6 +36,7 @@ export const fillCanvas = (canvas, {pixelSize}, grid) => {
         //canvas.fillStyle = blockColor;
         //canvas.arc(width, height, size/2 , 0, 2 * Math.PI);
         //canvas.fill(1);
+        //}, 0)
       }
 
     });

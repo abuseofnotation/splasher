@@ -19,6 +19,29 @@ const cornerProximityFn = (intensity = 1, {width, height}) => (x, y) => {
 
 export const cornerProximity = (config, intensity = 2) => intensityMap(config)(cornerProximityFn(intensity, config))
 
+
+const hallwayFn = (intensity = 1, {width, height}) => (x, y) => {
+  const hallwaySize = 3
+  if (x < height/hallwaySize || x > 2 * (height/hallwaySize)) {
+    return intensity;
+  } else {
+    return 0;
+  }
+}
+export const hallway = (config, intensity = 4) => intensityMap(config)(hallwayFn(intensity, config))
+
+const smallestNumber = (numbers) => numbers.reduce((a, b) => a < b ? a : b)
+
+const diagonalsFn = (intensity = 600, {width, height}) => (x, y) => {
+  // console.log({width, height, x, y})
+  const leftDiagonal = 1 + (intensity * Math.abs(x/width - y/height))
+  const rightDiagonal = 1 + (intensity * Math.abs((width - x)/width - y/height))
+  const num = smallestNumber([leftDiagonal, rightDiagonal])
+  return Math.floor(num) 
+}
+export const diagonals = (config, intensity = 4) => intensityMap(config)(diagonalsFn(intensity, config))
+
+
 const createSymmetry = (map) => map.map((row, i) => {
   if (i < map.length/2) {
     return row 
