@@ -30,8 +30,8 @@ define("utils", ["require", "exports"], function (require, exports) {
 define("lib", ["require", "exports"], function (require, exports) {
     "use strict";
     exports.__esModule = true;
-    exports.fillCanvas = exports.init = exports.pick = exports.intensityMap = exports.random = void 0;
-    var random = function (intensity) { return getRandomInt(intensity) + 1 === intensity; };
+    exports.fillCanvas = exports.init = exports.pick = exports.getRandomInt = exports.intensityMap = exports.random = void 0;
+    var random = function (intensity) { return (0, exports.getRandomInt)(intensity) + 1 === intensity; };
     exports.random = random;
     var intensityMap = function (_a) {
         var width = _a.width, height = _a.height;
@@ -43,7 +43,8 @@ define("lib", ["require", "exports"], function (require, exports) {
     var getRandomInt = function (max) {
         return Math.floor(Math.random() * Math.floor(max));
     };
-    var pick = function (options) { return options[getRandomInt(options.length)]; };
+    exports.getRandomInt = getRandomInt;
+    var pick = function (options) { return options[(0, exports.getRandomInt)(options.length)]; };
     exports.pick = pick;
     var init = function (_a) {
         var width = _a.width, height = _a.height;
@@ -56,13 +57,14 @@ define("lib", ["require", "exports"], function (require, exports) {
         var pixelSize = _a.pixelSize;
         var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
-        grid.forEach(function (row, verticalIndex) {
-            row.forEach(function (blockColor, horizontalIndex) {
+        console.log("Rendering grid", grid);
+        grid.forEach(function (row, horizontalIndex) {
+            row.forEach(function (blockColor, verticalIndex) {
                 if (blockColor) {
                     var width = horizontalIndex * pixelSize;
-                    var heigth = verticalIndex * pixelSize;
+                    var height = verticalIndex * pixelSize;
                     context.fillStyle = blockColor;
-                    context.fillRect(width, heigth, pixelSize, pixelSize);
+                    context.fillRect(width, height, pixelSize, pixelSize);
                 }
             });
         });
@@ -84,31 +86,69 @@ define("lib", ["require", "exports"], function (require, exports) {
 define("maps", ["require", "exports", "lib"], function (require, exports, lib_js_1) {
     "use strict";
     exports.__esModule = true;
-    exports.constant = exports.symmetry = exports.verticalSymmetry = exports.horizontalSymmetry = exports.cornerProximity = exports.centerProximity = void 0;
-    var centerProximityFn = function (intensity) { return function (x, y) {
-        var xP = Math.abs((1000 / 5) / 2 - x);
-        var yP = Math.abs((1000 / 5) / 2 - y);
-        return intensity * (Math.sqrt(xP * xP + yP * yP));
-    }; };
+    exports.circle = exports.triangles = exports.fractal = exports.grandient = exports.horizontalLines = exports.verticalLines = exports.constant = exports.symmetry = exports.verticalSymmetry = exports.horizontalSymmetry = exports.diagonals = exports.hallway = exports.cornerProximity = exports.centerProximity = void 0;
+    var centerProximityFn = function (intensity, _a) {
+        var width = _a.width, height = _a.height;
+        return function (x, y) {
+            var xP = Math.abs(width / 2 - x);
+            var yP = Math.abs(height / 2 - y);
+            return intensity * (Math.sqrt(xP * xP + yP * yP));
+        };
+    };
     var centerProximity = function (config, intensity) {
         if (intensity === void 0) { intensity = 1; }
-        return (0, lib_js_1.intensityMap)(config)(centerProximityFn(intensity));
+        return (0, lib_js_1.intensityMap)(config)(centerProximityFn(intensity, config));
     };
     exports.centerProximity = centerProximity;
-    var cornerDistance = function (x) { return x < ((1000 / 5) - x) ? x : ((1000 / 5) - x); };
-    var cornerProximityFn = function (config, intensity) {
+    var cornerDistance = function (x, l) { return x < (l - x) ? x : (l - x); };
+    var cornerProximityFn = function (intensity, _a) {
         if (intensity === void 0) { intensity = 1; }
+        var width = _a.width, height = _a.height;
         return function (x, y) {
-            var xP = cornerDistance(x);
-            var yP = cornerDistance(y);
+            var xP = cornerDistance(x, width);
+            var yP = cornerDistance(y, height);
             return intensity * Math.sqrt(xP * xP + yP * yP);
         };
     };
     var cornerProximity = function (config, intensity) {
         if (intensity === void 0) { intensity = 2; }
-        return (0, lib_js_1.intensityMap)(config)(cornerProximityFn(config, intensity));
+        return (0, lib_js_1.intensityMap)(config)(cornerProximityFn(intensity, config));
     };
     exports.cornerProximity = cornerProximity;
+    var hallwayFn = function (intensity, _a) {
+        if (intensity === void 0) { intensity = 1; }
+        var width = _a.width, height = _a.height;
+        return function (x, y) {
+            var hallwaySize = 3;
+            if (x < height / hallwaySize || x > 2 * (height / hallwaySize)) {
+                return intensity;
+            }
+            else {
+                return 0;
+            }
+        };
+    };
+    var hallway = function (config, intensity) {
+        if (intensity === void 0) { intensity = 4; }
+        return (0, lib_js_1.intensityMap)(config)(hallwayFn(intensity, config));
+    };
+    exports.hallway = hallway;
+    var smallestNumber = function (numbers) { return numbers.reduce(function (a, b) { return a < b ? a : b; }); };
+    var diagonalsFn = function (intensity, _a) {
+        if (intensity === void 0) { intensity = 600; }
+        var width = _a.width, height = _a.height;
+        return function (x, y) {
+            var leftDiagonal = 1 + (intensity * Math.abs(x / width - y / height));
+            var rightDiagonal = 1 + (intensity * Math.abs((width - x) / width - y / height));
+            var num = smallestNumber([leftDiagonal, rightDiagonal]);
+            return Math.floor(num);
+        };
+    };
+    var diagonals = function (config, intensity) {
+        if (intensity === void 0) { intensity = 4; }
+        return (0, lib_js_1.intensityMap)(config)(diagonalsFn(intensity, config));
+    };
+    exports.diagonals = diagonals;
     var createSymmetry = function (map) { return map.map(function (row, i) {
         if (i < map.length / 2) {
             return row;
@@ -140,8 +180,97 @@ define("maps", ["require", "exports", "lib"], function (require, exports, lib_js
         return (0, lib_js_1.intensityMap)(config)(function () { return intensity; });
     };
     exports.constant = constant;
+    var verticalLinesFn = function (intensity, _a) {
+        if (intensity === void 0) { intensity = 1; }
+        var width = _a.width, height = _a.height;
+        return function (x, y) {
+            var xP = cornerDistance(x, width);
+            var yP = cornerDistance(y, height);
+            return intensity * Math.sqrt(xP * xP + yP * yP);
+        };
+    };
+    var verticalLines = function (config, intensity) {
+        if (intensity === void 0) { intensity = 100; }
+        return (0, lib_js_1.intensityMap)(config)(function (x, y) { return x % intensity * 5; });
+    };
+    exports.verticalLines = verticalLines;
+    var horizontalLines = function (config, intensity) {
+        if (intensity === void 0) { intensity = 100; }
+        return (0, lib_js_1.intensityMap)(config)(function (x, y) { return y % intensity * 5; });
+    };
+    exports.horizontalLines = horizontalLines;
+    var grandient = function (config, intensity) {
+        if (intensity === void 0) { intensity = 100; }
+        return (0, lib_js_1.intensityMap)(config)(function (x, y) { return (config.height - y) * intensity; });
+    };
+    exports.grandient = grandient;
+    var fractal = function (config, intensity) {
+        if (intensity === void 0) { intensity = 5; }
+        return (0, lib_js_1.intensityMap)(config)(function (x, y) { return ((x ^ y) % intensity === 0) ? 0 : 1; });
+    };
+    exports.fractal = fractal;
+    var triangles = function (config, intensity) {
+        if (intensity === void 0) { intensity = 5; }
+        return (0, lib_js_1.intensityMap)(config)(function (x, y) { return (((x) & (x ^ y)) === 0) ? 1 : 0; });
+    };
+    exports.triangles = triangles;
+    var circle = function (config, radiusCoefficient) {
+        if (radiusCoefficient === void 0) { radiusCoefficient = 4; }
+        return (0, lib_js_1.intensityMap)(config)(function (x, y) {
+            var radius = config.width / (radiusCoefficient / 10);
+            var xCentre = config.width / 2;
+            var yCentre = config.height / 2;
+            var xDistance = Math.abs(x - xCentre);
+            var yDistance = Math.abs(y - yCentre);
+            if (((xDistance * xDistance) + (yDistance * yDistance)) > radius * radius) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        });
+    };
+    exports.circle = circle;
 });
-define("fillers", ["require", "exports", "lib", "maps"], function (require, exports, lib_js_2, maps) {
+define("sizers", ["require", "exports", "lib"], function (require, exports, lib) {
+    "use strict";
+    exports.__esModule = true;
+    exports.intenso = exports.intensoReversed = exports.random = exports.constant = void 0;
+    var constant = function (config, size) {
+        if (size === void 0) { size = 2000; }
+        return function (_a, cellIntensity) {
+            var x = _a.x, y = _a.y;
+            return lib.random(cellIntensity) ? size : 0;
+        };
+    };
+    exports.constant = constant;
+    var random = function (config, size) {
+        if (size === void 0) { size = 2000; }
+        return function (_a, cellIntensity) {
+            var x = _a.x, y = _a.y;
+            return lib.random(cellIntensity) ? lib.getRandomInt(size) : 0;
+        };
+    };
+    exports.random = random;
+    var minIntensityCoefficient = 20;
+    var intensoReversed = function (config, size) {
+        if (size === void 0) { size = 2000; }
+        return function (_a, cellIntensity) {
+            var x = _a.x, y = _a.y;
+            return lib.random(cellIntensity) ? size * (cellIntensity / (minIntensityCoefficient * size)) : 0;
+        };
+    };
+    exports.intensoReversed = intensoReversed;
+    var intenso = function (config, size) {
+        if (size === void 0) { size = 2000; }
+        return function (_a, cellIntensity) {
+            var x = _a.x, y = _a.y;
+            return lib.random(cellIntensity) ? size - (size * (cellIntensity / (minIntensityCoefficient * size))) : 0;
+        };
+    };
+    exports.intenso = intenso;
+});
+define("fillers", ["require", "exports", "lib", "maps", "sizers"], function (require, exports, lib_js_2, maps, sizers) {
     "use strict";
     exports.__esModule = true;
     exports.plasher = exports.splasher = void 0;
@@ -176,34 +305,42 @@ define("fillers", ["require", "exports", "lib", "maps"], function (require, expo
         return empty;
     };
     var verify = function (filler) { return function (_a, config, canvas) {
-        var size = _a.size, colors = _a.colors, map = _a.map, params = _a.params;
+        var size = _a.size, sizeParams = _a.sizeParams, colors = _a.colors, map = _a.map, params = _a.params;
         var theColors = (colors || config.colors).split(',');
         var mapFn = maps[map];
+        var sizeFn = sizers[size];
         if (mapFn === undefined) {
             throw "Undefined map - ".concat(map);
         }
+        else if (sizeFn === undefined) {
+            throw "Undefined sizer - ".concat(size);
+        }
         else {
-            return filler({ size: size, colors: theColors, map: mapFn(config, parseFloat(params)) }, config, canvas);
+            var map_1 = mapFn(config, parseFloat(params));
+            console.log('Filling layer', { size: size, colors: colors, map: map_1, params: params });
+            console.log("Generated intensity map", map_1);
+            return filler({
+                colors: theColors,
+                sizeFn: sizeFn(config, parseFloat(sizeParams)),
+                map: map_1
+            }, config, canvas);
         }
     }; };
     exports.splasher = verify(function (_a, config, canvas) {
-        var size = _a.size, colors = _a.colors, map = _a.map;
+        var sizeFn = _a.sizeFn, colors = _a.colors, map = _a.map;
         map
             .forEach(function (row, x) { return row.forEach(function (cellIntensity, y) {
-            if ((0, lib_js_2.random)(cellIntensity)) {
-                splashSpot(canvas, x, y, (0, lib_js_2.pick)(colors || config.colors), parseInt(size));
-            }
+            splashSpot(canvas, x, y, (0, lib_js_2.pick)(colors || config.colors), parseInt(sizeFn({ x: x, y: y }, cellIntensity)));
         }); });
         return canvas;
     });
     exports.plasher = verify(function (_a, config, canvas) {
-        var size = _a.size, colors = _a.colors, map = _a.map;
+        var sizeFn = _a.sizeFn, colors = _a.colors, map = _a.map;
         map
             .forEach(function (row, x) { return row.forEach(function (cellIntensity, y) {
-            if ((0, lib_js_2.random)(cellIntensity)) {
-                if (empty(canvas, x, y, (0, lib_js_2.pick)(colors || config.colors), parseInt(size))) {
-                    splashSpot(canvas, x, y, (0, lib_js_2.pick)(colors || config.colors), parseInt(size));
-                }
+            var size = sizeFn({ x: x, y: y }, cellIntensity);
+            if (empty(canvas, x, y, (0, lib_js_2.pick)(colors || config.colors), parseInt(size))) {
+                splashSpot(canvas, x, y, (0, lib_js_2.pick)(colors || config.colors), parseInt(size));
             }
         }); });
         return canvas;
@@ -213,14 +350,23 @@ define("render", ["require", "exports", "lib", "fillers"], function (require, ex
     "use strict";
     exports.__esModule = true;
     exports.render = void 0;
-    var render = function (canvas) {
-        var config = Object.assign({}, canvas.dataset);
-        config.width = canvas.width;
-        config.height = canvas.height;
+    var render = function (canvas, config) {
         config.pixelSize = parseInt(config.pixel);
+        config.width = parseInt(canvas.width) / config.pixelSize;
+        config.height = parseInt(canvas.height) / config.pixelSize;
+        console.log("Found canvas ", config);
         var grid = (0, lib_1.init)(config)();
-        Array.prototype.slice.call(canvas.children).forEach(function (layer) {
-            grid = fillers[layer.localName](layer.dataset, config, grid);
+        Array.prototype.slice.call(canvas.children)
+            .forEach(function (layer) {
+            if (config.drawLayerByLayer) {
+                setTimeout(function () {
+                    grid = fillers[layer.localName](layer.dataset, config, grid);
+                    (0, lib_1.fillCanvas)(canvas, config, grid);
+                }, 1);
+            }
+            else {
+                grid = fillers[layer.localName](layer.dataset, config, grid);
+            }
         });
         (0, lib_1.fillCanvas)(canvas, config, grid);
     };
@@ -229,12 +375,31 @@ define("render", ["require", "exports", "lib", "fillers"], function (require, ex
 define("index", ["require", "exports", "render"], function (require, exports, render_1) {
     "use strict";
     exports.__esModule = true;
+    var parseBool = function (str) {
+        if (str === "true" || str === true) {
+            return true;
+        }
+        if (str === "false" || str === false) {
+            return false;
+        }
+        if (str === undefined) {
+            return false;
+        }
+        else {
+            throw new TypeError("".concat(str, " is not a bool"));
+        }
+    };
+    var defaultConfig = {};
     var renderStuff = function () {
         Array.prototype.slice.call(document.getElementsByClassName('art')).forEach(function (canvas) {
-            console.log(canvas.dataset);
-            (0, render_1.render)(canvas);
-            if (canvas.dataset.repeat) {
-                setInterval(function () { return (0, render_1.render)(canvas); }, parseInt(canvas.dataset.repeat));
+            console.log('data', canvas.dataset);
+            var config = Object.assign({}, defaultConfig, canvas.dataset);
+            config.repeat = parseInt(config.repeat);
+            config.drawLayerbyLayer = parseBool(config.drawLayerByLayer);
+            console.log('Rendering canvas with data ', config);
+            (0, render_1.render)(canvas, config);
+            if (config.repeat) {
+                setInterval(function () { return (0, render_1.render)(canvas, config); }, config.repeat);
             }
         });
     };

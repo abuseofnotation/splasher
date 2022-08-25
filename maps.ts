@@ -67,3 +67,40 @@ export const symmetry = (config, intensity = 2000) => {
 
 export const constant = (config, intensity = 2000) => intensityMap(config)(() => intensity)
 
+
+
+const verticalLinesFn = (intensity = 1, {width, height}) => (x, y) => {
+  const xP = cornerDistance(x, width)
+  const yP = cornerDistance(y, height)
+  return  intensity * Math.sqrt(xP*xP + yP*yP)
+}
+
+export const verticalLines = (config, intensity = 100) => intensityMap(config)((x, y) => x % intensity * 5 )
+
+export const horizontalLines = (config, intensity = 100) => intensityMap(config)((x, y) => y % intensity * 5)
+
+
+export const grandient = (config, intensity = 100) => intensityMap(config)((x, y) => (config.height - y) * intensity)
+
+
+
+export const fractal = (config, intensity = 5) => intensityMap(config)((x, y) => ((x ^ y) % intensity === 0) ? 0 : 1)
+
+
+
+export const triangles = (config, intensity = 5) => intensityMap(config)((x, y) =>(((x) & (x^y)) === 0) ? 1: 0)
+
+export const circle = (config, radiusCoefficient= 4) => intensityMap(config)((x, y) => {
+  const radius = config.width/(radiusCoefficient/10)
+  const xCentre = config.width/2
+  const yCentre = config.height/2
+  const xDistance = Math.abs(x - xCentre)
+  const yDistance = Math.abs(y - yCentre)
+  if (((xDistance * xDistance) + (yDistance * yDistance)) > radius * radius) {
+    return 1
+  } else {
+    return 0
+  }
+
+})
+

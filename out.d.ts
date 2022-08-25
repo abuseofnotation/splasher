@@ -10,6 +10,7 @@ declare module "lib" {
         width: any;
         height: any;
     }) => (intensityFn: any) => any[][];
+    export const getRandomInt: (max: any) => number;
     export const pick: (options: any) => any;
     export const init: ({ width, height }: {
         width: any;
@@ -22,27 +23,47 @@ declare module "lib" {
 declare module "maps" {
     export const centerProximity: (config: any, intensity?: number) => any[][];
     export const cornerProximity: (config: any, intensity?: number) => any[][];
+    export const hallway: (config: any, intensity?: number) => any[][];
+    export const diagonals: (config: any, intensity?: number) => any[][];
     export const horizontalSymmetry: (config: any, intensity?: number) => any;
     export const verticalSymmetry: (config: any, intensity?: number) => any[];
     export const symmetry: (config: any, intensity?: number) => any;
     export const constant: (config: any, intensity?: number) => any[][];
+    export const verticalLines: (config: any, intensity?: number) => any[][];
+    export const horizontalLines: (config: any, intensity?: number) => any[][];
+    export const grandient: (config: any, intensity?: number) => any[][];
+    export const fractal: (config: any, intensity?: number) => any[][];
+    export const triangles: (config: any, intensity?: number) => any[][];
+    export const circle: (config: any, radiusCoefficient?: number) => any[][];
+}
+declare module "sizers" {
+    interface Coordinates {
+        x: number;
+        y: number;
+    }
+    export const constant: (config: any, size?: number) => ({ x, y }: Coordinates, cellIntensity: any) => number;
+    export const random: (config: any, size?: number) => ({ x, y }: Coordinates, cellIntensity: any) => number;
+    export const intensoReversed: (config: any, size?: number) => ({ x, y }: Coordinates, cellIntensity: any) => number;
+    export const intenso: (config: any, size?: number) => ({ x, y }: Coordinates, cellIntensity: any) => number;
 }
 declare module "fillers" {
-    export const splasher: ({ size, colors, map, params }: {
+    export const splasher: ({ size, sizeParams, colors, map, params }: {
         size: any;
+        sizeParams: any;
         colors: any;
         map: any;
         params: any;
     }, config: any, canvas: any) => any;
-    export const plasher: ({ size, colors, map, params }: {
+    export const plasher: ({ size, sizeParams, colors, map, params }: {
         size: any;
+        sizeParams: any;
         colors: any;
         map: any;
         params: any;
     }, config: any, canvas: any) => any;
 }
 declare module "render" {
-    export const render: (canvas: any) => void;
+    export const render: (canvas: any, config: any) => void;
 }
 declare module "index" { }
 declare module "processors" {
