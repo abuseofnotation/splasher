@@ -10,7 +10,7 @@ const parseBool = (str) => {
 }
 
 const defaultConfig = {
-  //drawLayerByLayer: true,
+  drawLayerByLayer: true,
   //repeat: 3000,
 }
 

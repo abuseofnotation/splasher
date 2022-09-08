@@ -35,44 +35,8 @@ const empty = (canvas, x, y, color, size = 3) => {
   return empty
 }
 
-
-
-/*
-const arr = [
-  [0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0],
-]
-splash(arr, 3, 2, 1, 2)
-
-console.log(printArray(arr))
-
-
-const verifyLayer = (layer) => {
-
-  const splasherName = layer.localName
-
-  if (layerFillers[splasherName]) {
-  }
-
-
-  let map = layer.dataset.map
-  if (maps[map] === undefined) {
-    throw `Undefined map - ${map}`
-  }
-
-  return layer;
-} 
-
-
-*/
-
-const verify = (filler) => ({size, sizeParams, colors, map, params}, config, canvas) => {
+const verify = (filler) => (layer, config, canvas) => {
+  let {size, sizeParams, colors, map, params} = layer.dataset
   let theColors = (colors || config.colors).split(',')
   let mapFn = maps[map]
   let sizeFn = sizers[size]
@@ -98,7 +62,10 @@ const verify = (filler) => ({size, sizeParams, colors, map, params}, config, can
 
 export const splasher = verify(({sizeFn, colors, map}, config, canvas) => {
     map
-    .forEach((row, x) => row.forEach((cellIntensity, y) => {
+    .forEach((row, _x) => row.forEach((cellIntensity, _y) => {
+
+      const x = _x + (config.x || 0)
+      const y = _y + (config.y || 0)
         splashSpot(canvas, x, y, pick(colors || config.colors), parseInt(sizeFn({x,y}, cellIntensity)))
     }))
     return canvas
@@ -106,7 +73,9 @@ export const splasher = verify(({sizeFn, colors, map}, config, canvas) => {
 
 export const plasher = verify(({sizeFn, colors, map}, config, canvas) => {
     map
-    .forEach((row, x) => row.forEach((cellIntensity, y) => {
+    .forEach((row, _x) => row.forEach((cellIntensity, _y) => {
+      const x = _x + (config.x || 0)
+      const y = _y + (config.y || 0)
       const size = sizeFn({x, y}, cellIntensity)
         if (empty(canvas, x, y, pick(colors || config.colors), parseInt(size))) {
           splashSpot(canvas, x, y, pick(colors || config.colors), parseInt(size))
@@ -115,3 +84,54 @@ export const plasher = verify(({sizeFn, colors, map}, config, canvas) => {
     ))
     return canvas
   })
+
+const toNumber = (quantity, globalQuantity) => {
+  if (quantity) {
+    if (/px/.test(quantity)) {
+      return parseInt(quantity);
+    } else if (/%/.test(quantity)){
+      return globalQuantity * parseFloat(quantity) / 100 
+    } else {
+      throw new TypeError(`Invalid quantity ${quantity}`)
+
+    }
+  } else {
+    return globalQuantity
+  }
+}
+
+export const layer = (canvas, parentConfig, grid) => {
+    const config = {
+      ...parentConfig,
+      width: toNumber(canvas.getAttribute("width") , parentConfig.width),
+      height: toNumber(canvas.getAttribute("height"), parentConfig.height),
+      x: toNumber((canvas.getAttribute("x") || "0px"), parentConfig.width) + (parent.x || 0),
+      y: toNumber((canvas.getAttribute("y") || "0px"), parentConfig.height) + (parent.y || 0),
+    }
+
+      console.log(parent.x || 0)
+      console.log(toNumber((canvas.getAttribute("x") || "0px"), parentConfig.width) + parent.x || 0)
+
+
+    console.log("Found layer ", config)
+
+    Array.prototype.slice.call(canvas.children)
+      .forEach((layer) => {
+        const filler = fillers[layer.localName]
+        if (filler === undefined) {
+          throw `Invalid filler ${layer.localName}`
+        } else {
+          /*
+          if (config.drawLayerByLayer) {
+            setTimeout(() => {
+            grid = filler(layer, config, grid)
+            fillCanvas(canvas, config, grid)
+            }, 1)
+          */
+          grid = filler(layer, config, grid)
+        }
+    })
+    return grid
+  }
+
+let fillers  = {splasher, plasher, layer}

@@ -3,8 +3,8 @@
     "compilerOptions" : {
         "module" : "amd",  /*  <----------------- REQUIRED  */
         "removeComments" : true,
-        "outFile" : "./out.js",  /*  <----------- REQUIRED  */
-        // "outFile" : "../x-notes/assets/out.js",  /*  <----------- REQUIRED  */
+        // "outFile" : "./out.js",  /*  <----------- REQUIRED  */
+        "outFile" : "../x-notes/assets/out.js",  /*  <----------- REQUIRED  */
         "baseUrl" : "./",
         "sourceMap" : true,  /*  <--------------- only to debug ts files */
         "alwaysStrict" : true,
