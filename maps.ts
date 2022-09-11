@@ -53,7 +53,7 @@ const createSymmetry = (map) => map.map((row, i) => {
 })
 
 export const horizontalSymmetry = (config, intensity = 2000) => {
-  const map = intensityMap(config)(() => random(intensity) ? 2 : undefined)
+  const map = intensityMap(config)(() => random(intensity) ? 1 : undefined)
   return createSymmetry(map)
 }
 export const verticalSymmetry = (config, intensity = 2000) => {
@@ -75,9 +75,9 @@ const verticalLinesFn = (intensity = 1, {width, height}) => (x, y) => {
   return  intensity * Math.sqrt(xP*xP + yP*yP)
 }
 
-export const verticalLines = (config, intensity = 100) => intensityMap(config)((x, y) => x % intensity * 5 )
+export const verticalLines = (config, intensity = 100) => intensityMap(config)((x, y) => x % (config.width / intensity) * 5 )
 
-export const horizontalLines = (config, intensity = 100) => intensityMap(config)((x, y) => y % intensity * 5)
+export const horizontalLines = (config, intensity = 100) => intensityMap(config)((x, y) => y % (config.height / intensity) * 5)
 
 
 export const grandient = (config, intensity = 100) => intensityMap(config)((x, y) => (config.height - y) * intensity)
