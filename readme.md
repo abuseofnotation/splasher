@@ -1,8 +1,8 @@
-This is a library for creating abstract pixel art, that I made for illustrating [my novel](https://boris-marinov.github.io/x-notes/)
+This is a library for creating abstract pixel art with code by utilizing randomized alghorithms --- pictures would be different each time they are generated.
 
-Allows you to draw abstract pixel art with code
+I made this for illustrating [my novel](https://boris-marinov.github.io/x-notes/), for a demo of what it can do, see [the illustrations I made for it](https://boris-marinov.github.io/x-notes/gallery/) (may take some time to load them all).
 
-For demos, see [the illustrations I made for it])https://boris-marinov.github.io/x-notes/gallery/)
+
 
 This is not intended for public use, mainly publishing it in case someone is interested in looking at the code and making their own version of this.
 
