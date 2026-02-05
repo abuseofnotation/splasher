@@ -1,0 +1,15 @@
+export declare const centerProximity: (config: any, intensity?: number) => any[][];
+export declare const cornerProximity: (config: any, intensity?: number) => any[][];
+export declare const hallway: (config: any, intensity?: number) => any[][];
+export declare const diagonals: (config: any, intensity?: number) => any[][];
+export declare const horizontalSymmetry: (config: any, intensity?: number) => any;
+export declare const verticalSymmetry: (config: any, intensity?: number) => any[];
+export declare const symmetry: (config: any, intensity?: number) => any;
+export declare const constant: (config: any, intensity?: number) => any[][];
+export declare const verticalLines: (config: any, intensity?: number) => any[][];
+export declare const horizontalLines: (config: any, intensity?: number) => any[][];
+export declare const grandient: (config: any, intensity?: number) => any[][];
+export declare const fractal: (config: any, intensity?: number) => any[][];
+export declare const triangles: (config: any, intensity?: number) => any[][];
+export declare const circle: (config: any, radiusCoefficient?: number) => any[][];
+//# sourceMappingURL=maps.d.ts.map
