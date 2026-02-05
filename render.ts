@@ -4,7 +4,7 @@ import * as fillers from './fillers.js'
 export const render = (canvas, config) => {
     config.width = parseInt(canvas.width)
     config.height = parseInt(canvas.height)
-    config.pixelSize = 1
+    config.pixelSize = parseInt(canvas.pixelSize)
 
     let grid = fillers.layer(canvas, config, init(config)())
     console.log('config', config)

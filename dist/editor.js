@@ -66,11 +66,15 @@ export class SplasherEditor {
             const canvas = doc.querySelector('canvas');
             if (!canvas)
                 return;
-            const width = canvas.getAttribute('width');
-            const height = canvas.getAttribute('height');
+            let width = canvas.getAttribute('width');
+            let height = canvas.getAttribute('height');
             const pixelSize = canvas.getAttribute('data-pixel');
             const colors = canvas.getAttribute('data-colors');
             const repeat = canvas.getAttribute('data-repeat');
+            if (width && width.endsWith('px'))
+                width = width.slice(0, -2);
+            if (height && height.endsWith('px'))
+                height = height.slice(0, -2);
             if (width)
                 document.getElementById('canvasWidth').value = width;
             if (height)
@@ -289,7 +293,8 @@ export class SplasherEditor {
         const pixelSize = document.getElementById('pixelSize').value;
         const colors = document.getElementById('globalColors').value;
         const repeat = document.getElementById('repeatMs').value;
-        let html = `<canvas class="art" width="${width}" height="${height}" data-pixel="${pixelSize}" data-colors="${colors}"`;
+        let html = `<script type="module" src="https://abuseofnotation.github.io/splasher/dist/index.js"><\/script>\n\n`;
+        html += `<canvas class="art" width="${width}px" height="${height}px" data-pixel="${pixelSize}" data-colors="${colors}"`;
         if (parseInt(repeat) > 0) {
             html += ` data-repeat="${repeat}"`;
         }
