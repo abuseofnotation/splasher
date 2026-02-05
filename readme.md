@@ -6,7 +6,13 @@ I made this for illustrating [my novel](https://boris-marinov.github.io/x-notes/
 
 This is not intended for public use, mainly publishing it in case someone is interested in looking at the code and making their own version of this.
 
-Syntax
+UI Use
+===
+
+See [user interface](abuseofnotation.github.io/splasher)
+---
+
+API use
 ===
 The basic syntax for creating a picture is creating a canvas element with class `art` and filling it with `splasher` elements, each element representing a layer.
 
