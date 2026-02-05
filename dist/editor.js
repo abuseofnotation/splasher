@@ -51,7 +51,6 @@ export class SplasherEditor {
     init() {
         document.getElementById('canvasWidth')?.addEventListener('input', () => this.throttledUpdate());
         document.getElementById('canvasHeight')?.addEventListener('input', () => this.throttledUpdate());
-        document.getElementById('pixelSize')?.addEventListener('input', () => this.throttledUpdate());
         document.getElementById('globalColors')?.addEventListener('input', () => {
             this.throttledUpdate();
         });
@@ -68,7 +67,6 @@ export class SplasherEditor {
                 return;
             let width = canvas.getAttribute('width');
             let height = canvas.getAttribute('height');
-            const pixelSize = canvas.getAttribute('data-pixel');
             const colors = canvas.getAttribute('data-colors');
             const repeat = canvas.getAttribute('data-repeat');
             if (width && width.endsWith('px'))
@@ -79,8 +77,6 @@ export class SplasherEditor {
                 document.getElementById('canvasWidth').value = width;
             if (height)
                 document.getElementById('canvasHeight').value = height;
-            if (pixelSize)
-                document.getElementById('pixelSize').value = pixelSize;
             if (colors)
                 document.getElementById('globalColors').value = colors;
             if (repeat)
@@ -222,14 +218,14 @@ export class SplasherEditor {
         const canvas = document.getElementById('previewCanvas');
         const canvasWidth = parseInt(document.getElementById('canvasWidth').value);
         const canvasHeight = parseInt(document.getElementById('canvasHeight').value);
-        const pixelSize = parseInt(document.getElementById('pixelSize').value);
+        const pixelSize = 1;
         const colors = document.getElementById('globalColors').value;
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
         const config = {
-            width: Math.floor(canvasWidth / pixelSize),
-            height: Math.floor(canvasHeight / pixelSize),
-            pixelSize: 1,
+            width: Math.floor(canvasWidth),
+            height: Math.floor(canvasHeight),
+            pixelSize,
             colors: colors,
             x: 0,
             y: 0
@@ -290,11 +286,10 @@ export class SplasherEditor {
     updateHtmlOutput() {
         const width = document.getElementById('canvasWidth').value;
         const height = document.getElementById('canvasHeight').value;
-        const pixelSize = document.getElementById('pixelSize').value;
         const colors = document.getElementById('globalColors').value;
         const repeat = document.getElementById('repeatMs').value;
         let html = `<script type="module" src="https://abuseofnotation.github.io/splasher/dist/index.js"><\/script>\n\n`;
-        html += `<canvas class="art" width="${width}px" height="${height}px" data-pixel="${pixelSize}" data-colors="${colors}"`;
+        html += `<canvas class="art" width="${width}px" height="${height}px" data-colors="${colors}"`;
         if (parseInt(repeat) > 0) {
             html += ` data-repeat="${repeat}"`;
         }

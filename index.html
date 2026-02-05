@@ -210,7 +210,8 @@
         }
 
         canvas {
-            max-width: 100%;
+            width: 100%;
+            image-rendering: pixelated;
             height: auto;
             border: 1px solid #000000;
             background: white;
@@ -319,7 +320,6 @@
             border: 1px solid #404050;
             cursor: pointer;
         }
-
         input[type="color"] {
             cursor: pointer;
             width: 50px;
@@ -403,15 +403,11 @@
                 <div class="section-title">Canvas Settings</div>
                 <div class="form-group">
                     <label>Width</label>
-                    <input type="number" id="canvasWidth" value="800" min="100" max="2000" step="10">
+                    <input type="number" id="canvasWidth" value="100" min="100" max="2000" step="10">
                 </div>
                 <div class="form-group">
                     <label>Height</label>
-                    <input type="number" id="canvasHeight" value="600" min="100" max="2000" step="10">
-                </div>
-                <div class="form-group">
-                    <label>Pixel Size</label>
-                    <input type="number" id="pixelSize" value="4" min="1" max="20" step="1">
+                    <input type="number" id="canvasHeight" value="100" min="100" max="2000" step="10">
                 </div>
                 <div class="form-group">
                     <label>Colors (comma-separated)</label>
