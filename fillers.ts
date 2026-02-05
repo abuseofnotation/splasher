@@ -41,9 +41,9 @@ const verify = (filler) => (layer, config, canvas) => {
   let mapFn = maps[map]
   let sizeFn = sizers[size]
   if (mapFn === undefined) {
-    throw `Undefined map - ${map}`
+    throw `Undefined map - ${map}, the maps are ${Object.keys(maps).join(', ')}`
   } else if (sizeFn === undefined) {
-    throw `Undefined sizer - ${size}`
+    throw `Undefined sizer - ${size}, the sizers are ${Object.keys(sizers).join(', ')}`
   } else {
 
     const map = mapFn(config, parseFloat(params))
@@ -105,12 +105,12 @@ export const layer = (canvas, parentConfig, grid) => {
       ...parentConfig,
       width: toNumber(canvas.getAttribute("width") , parentConfig.width),
       height: toNumber(canvas.getAttribute("height"), parentConfig.height),
-      x: toNumber((canvas.getAttribute("x") || "0px"), parentConfig.width) + (parent.x || 0),
-      y: toNumber((canvas.getAttribute("y") || "0px"), parentConfig.height) + (parent.y || 0),
+      x: toNumber((canvas.getAttribute("x") || "0px"), parentConfig.width) + (parentConfig.x || 0),
+      y: toNumber((canvas.getAttribute("y") || "0px"), parentConfig.height) + (parentConfig.y || 0),
     }
 
-      console.log(parent.x || 0)
-      console.log(toNumber((canvas.getAttribute("x") || "0px"), parentConfig.width) + parent.x || 0)
+      console.log(parentConfig.x || 0)
+      console.log(toNumber((canvas.getAttribute("x") || "0px"), parentConfig.width) + parentConfig.x || 0)
 
 
     console.log("Found layer ", config)

@@ -47,20 +47,9 @@ declare module "sizers" {
     export const intenso: (config: any, size?: number) => ({ x, y }: Coordinates, cellIntensity: any) => number;
 }
 declare module "fillers" {
-    export const splasher: ({ size, sizeParams, colors, map, params }: {
-        size: any;
-        sizeParams: any;
-        colors: any;
-        map: any;
-        params: any;
-    }, config: any, canvas: any) => any;
-    export const plasher: ({ size, sizeParams, colors, map, params }: {
-        size: any;
-        sizeParams: any;
-        colors: any;
-        map: any;
-        params: any;
-    }, config: any, canvas: any) => any;
+    export const splasher: (layer: any, config: any, canvas: any) => any;
+    export const plasher: (layer: any, config: any, canvas: any) => any;
+    export const layer: (canvas: any, parentConfig: any, grid: any) => any;
 }
 declare module "render" {
     export const render: (canvas: any, config: any) => void;
