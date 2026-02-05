@@ -1,15 +1,17 @@
 {
     "version" : "3.0.3",
     "compilerOptions" : {
-        "module" : "amd",  /*  <----------------- REQUIRED  */
+        "module" : "esnext",  /*  ES6 modules */
+        "target" : "esnext",
+        "outDir" : "./dist",  /*  Output directory */
+        "rootDir" : "./",
         "removeComments" : true,
-        "outFile" : "./out.js",  /*  <----------- REQUIRED  */
-        //"outFile" : "../x-notes/assets/out.js",  /*  <----------- REQUIRED  */
         "baseUrl" : "./",
-        "sourceMap" : true,  /*  <--------------- only to debug ts files */
+        "sourceMap" : true,  /*  only to debug ts files */
         "alwaysStrict" : true,
         "declaration" : true,
-        "allowJs" : true,
+        "declarationMap" : true,
+        "allowJs" : false,
         "lib": [
           "es2015",
           "DOM"
@@ -17,11 +19,11 @@
         
     },
     "include": [
-        "./**/*.ts",
-        "./**/*.js"
+        "./**/*.ts"
     ],
     "exclude": [
-        "./out.js",
-        "./out.d.ts"
+        "./dist",
+        "./node_modules",
+        "./00"
     ]
 }

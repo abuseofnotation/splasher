@@ -1,5 +1,5 @@
-import { init, fillCanvas } from './lib'
-import * as fillers from './fillers'
+import { init, fillCanvas } from './lib.js'
+import * as fillers from './fillers.js'
 
 export const render = (canvas, config) => {
     config.width = parseInt(canvas.width)

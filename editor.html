@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splasher Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            height: calc(100vh - 20px);
+        }
+
+        .panel {
+            background: #ffffff;
+            border: 1px solid #000000;
+            border-radius: 6px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .section {
+            border: 1px solid #000000;
+            border-radius: 4px;
+            padding: 8px;
+            background: #f5f5f5;
+        }
+
+        .control-panel > .section:nth-child(3) {
+            flex-grow: 1;
+            overflow-y: visible;
+            min-height: auto;
+        }
+
+        #layersList {
+            min-height: 0;
+            overflow-y: visible;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #000000;
+            margin-bottom: 6px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-bottom: 6px;
+        }
+
+        .form-group-row {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-bottom: 6px;
+        }
+
+        .form-group-row label {
+            flex: 1;
+            font-size: 11px;
+            font-weight: 500;
+            color: #000000;
+            margin-bottom: 0;
+        }
+
+        .form-group-row-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .form-group-row select {
+            flex: 0 0 auto;
+            width: 70px;
+            min-width: 70px;
+        }
+
+        .form-group-row input[type="range"] {
+            flex: 1;
+            min-width: 60px;
+            margin-bottom: 0;
+        }
+
+        .form-group-row .slider-value {
+            flex: 0 0 35px;
+            text-align: right;
+        }
+
+        label {
+            font-size: 11px;
+            font-weight: 500;
+            color: #000000;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            padding: 4px 8px;
+            background: #ffffff;
+            border: 1px solid #000000;
+            border-radius: 3px;
+            color: #000000;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            transition: border-color 0.2s;
+            line-height: 1.4;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            font-size: 10px;
+            color: #a0a0b0;
+            text-align: right;
+        }
+
+        button {
+            padding: 6px 12px;
+            background: #000000;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 11px;
+        }
+
+        button:hover {
+            background: #333333;
+        }
+
+        button.secondary {
+            background: #404050;
+            color: #e0e0e0;
+        }
+
+        button.secondary:hover {
+            background: #505060;
+        }
+
+        button.danger {
+            background: #ff6b6b;
+        }
+
+        button.danger:hover {
+            background: #ff5252;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .preview-area {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .canvas-wrapper {
+            background: #ffffff;
+            border: 1px solid #000000;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            flex: 1;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #000000;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .layer-item {
+            background: #f5f5f5;
+            border: 1px solid #000000;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 8px;
+            transition: border-color 0.2s;
+        }
+
+        .layer-item.active {
+            border-color: #000000;
+            background: #e8e8e8;
+        }
+
+        .layer-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .layer-item-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .layer-item-delete {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 10px;
+            transition: background 0.2s;
+        }
+
+        .layer-item-delete:hover {
+            background: #ff5252;
+        }
+
+        .layer-item-config {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .code-output {
+            background: #f5f5f5;
+            border: 1px solid #000000;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+            color: #000000;
+        }
+
+        .copy-button {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #404050;
+            border-top-color: #6b9eff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .info-text {
+            font-size: 10px;
+            color: #666666;
+            margin-top: 4px;
+        }
+
+        .color-input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            border: 1px solid #404050;
+            cursor: pointer;
+        }
+
+        input[type="color"] {
+            cursor: pointer;
+            width: 50px;
+            height: 40px;
+            border: 1px solid #404050;
+            border-radius: 4px;
+            padding: 2px;
+        }
+
+        input[type="checkbox"] {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: #000000;
+        }
+
+        .color-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .color-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f5f5f5;
+            border: 1px solid #000000;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .color-tag-remove {
+            cursor: pointer;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .color-tag-remove:hover {
+            color: #ff5252;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                max-height: none;
+            }
+        }
+
+        .status-message {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 3px;
+            margin-bottom: 6px;
+        }
+
+        .status-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+
+        .status-error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Control Panel -->
+        <div class="panel control-panel">
+            <!-- Global Canvas Settings -->
+            <div class="section">
+                <div class="section-title">Canvas Settings</div>
+                <div class="form-group">
+                    <label>Width</label>
+                    <input type="number" id="canvasWidth" value="800" min="100" max="2000" step="10">
+                </div>
+                <div class="form-group">
+                    <label>Height</label>
+                    <input type="number" id="canvasHeight" value="600" min="100" max="2000" step="10">
+                </div>
+                <div class="form-group">
+                    <label>Pixel Size</label>
+                    <input type="number" id="pixelSize" value="4" min="1" max="20" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Colors (comma-separated)</label>
+                    <input type="text" id="globalColors" value="black,pink,grey">
+                </div>
+                <div class="form-group">
+                    <label>Auto-regenerate (ms, 0 = disabled)</label>
+                    <input type="number" id="repeatMs" value="0" min="0" step="100">
+                </div>
+            </div>
+
+            <!-- Layers Section -->
+            <div class="section">
+                <div class="section-title">Layers</div>
+                <div id="layersList" style="margin-bottom: 6px;"></div>
+                <button onclick="editor.addLayer()" style="width: 100%;">+ Add Layer</button>
+            </div>
+
+            <!-- Export -->
+            <div class="section">
+                <div class="section-title">Export</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                    <button class="copy-button" onclick="editor.saveHtml()">Save</button>
+                    <button class="copy-button" onclick="editor.loadHtml()">Load</button>
+                </div>
+            </div>
+            <input type="file" id="fileInput" accept=".html" style="display: none;">
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="panel preview-area">
+            <div id="statusMessage" style="display: none;"></div>
+            <div class="canvas-wrapper">
+                <canvas id="previewCanvas" width="800" height="600" style="display: block; margin: 0 auto;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { SplasherEditor } from './dist/editor.js';
+    </script>
+</body>
+</html>

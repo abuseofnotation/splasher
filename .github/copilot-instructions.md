@@ -76,22 +76,39 @@ Grids are 2D arrays: `grid[x][y]` where values are `undefined` (empty) or color 
 
 ## Build & Development
 
+### Project Structure
+```
+src/
+  *.ts          # TypeScript source files
+dist/           # Compiled ES6 modules (generated)
+  *.js          # JavaScript output
+  *.d.ts        # Declaration files
+  *.map         # Source maps
+```
+
 ### Compilation
 ```bash
-tsc  # Compile TypeScript to AMD module format (out.js + out.d.ts)
+tsc  # Compile TypeScript to ES6 modules in dist/ directory
 ```
-**Configuration**: [tsconfig.json](tsconfig.json) uses `"module": "amd"` and `"outFile"` for bundling.
+**Configuration**: [tsconfig.json](tsconfig.json) uses `"module": "esnext"` and `"outDir": "dist"` for clean separation.
+
+### Module System
+The project uses native ES6 modules:
+- TypeScript files in root compile to `dist/` directory
+- Browser loads via `<script type="module" src="dist/index.js"></script>`
+- All imports use `.js` file extensions: `import { foo } from './lib.js'`
+- No bundler required for browser use
 
 ### Deployment
 ```bash
-./update.sh  # Copies out.js to external project (thoughts-of-x/assets/)
+./update.sh  # Copies dist/ files to external project (thoughts-of-x/assets/)
 ```
 
 ### Development Notes
-- TypeScript target: ES2015 with DOM lib
-- Source maps enabled for debugging `.ts` files
-- Requires `require.js` for AMD module loading in browser
-- No test framework present; validation is manual + browser-based
+- TypeScript target: ES2015+ with DOM lib
+- Source maps enabled for debugging `.ts` files in browser DevTools
+- Compiled files in `dist/` are excluded from version control
+- No require.js or AMD modules needed
 
 ## Extension Points
 

@@ -52,20 +52,20 @@ const createSymmetry = (map) => map.map((row, i) => {
   }
 })
 
-export const horizontalSymmetry = (config, intensity = 2000) => {
-  const map = intensityMap(config)(() => random(intensity) ? 1 : undefined)
+export const horizontalSymmetry = (config, intensity = 200) => {
+  const map = intensityMap(config)(() => random(intensity * 10) ? 1 : undefined)
   return createSymmetry(map)
 }
-export const verticalSymmetry = (config, intensity = 2000) => {
-  const map = intensityMap(config)(() => random(intensity) ? 1 : undefined)
+export const verticalSymmetry = (config, intensity = 200) => {
+  const map = intensityMap(config)(() => random(intensity * 10 ) ? 1 : undefined)
   return map.map(createSymmetry)
 }
-export const symmetry = (config, intensity = 2000) => {
-  const map = intensityMap(config)(() => random(intensity) ? 1 : undefined)
+export const symmetry = (config, intensity = 200) => {
+  const map = intensityMap(config)(() => random(intensity * 10 ) ? 1 : undefined)
   return createSymmetry(map).map(createSymmetry)
 }
 
-export const constant = (config, intensity = 2000) => intensityMap(config)(() => intensity)
+export const constant = (config, intensity = 200) => intensityMap(config)(() => intensity * 10)
 
 
 

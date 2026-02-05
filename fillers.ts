@@ -1,8 +1,7 @@
-import { rCompose, compose} from './utils.js'
+import { rCompose, compose } from './utils.js'
 import { pick, random, intensityMap } from './lib.js'
-
-import * as maps from './maps' 
-import * as sizers from './sizers' 
+import * as maps from './maps.js'
+import * as sizers from './sizers.js' 
 
 
 const splashSpot = (canvas, x, y, color, size = 3) => { 

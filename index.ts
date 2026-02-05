@@ -2,11 +2,13 @@
   Scans through the html and calls the rendering functions on canvases
   */
 
+import { render } from './render.js'
+
 const parseBool = (str) => {
-  if (str === "true" || str === true){ return true }
-  if (str === "false" || str === false){ return false }
+  if (str === "true" || str === true) { return true }
+  if (str === "false" || str === false) { return false }
   if (str === undefined) { return false }
-  else {throw new TypeError(`${str} is not a bool`)}
+  else { throw new TypeError(`${str} is not a bool`) }
 }
 
 const defaultConfig = {
@@ -14,7 +16,6 @@ const defaultConfig = {
   //repeat: 3000,
 }
 
-import {render} from './render'
 const renderStuff = () => {
   Array.prototype.slice.call(document.getElementsByClassName('art')).forEach((canvas) => {
     console.log('data', canvas.dataset);
@@ -34,4 +35,7 @@ if (document.readyState === "complete" || document.readyState === "interactive")
 } else {
   document.addEventListener("DOMContentLoaded", renderStuff)
 }
+
+// Export for use as module
+export { renderStuff }
 
