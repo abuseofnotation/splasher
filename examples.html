@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Splasher</title>
+<!--<link rel="stylesheet" href="style.css" /> -->
+
+</head>
+<body id="home">
+
+
+<canvas class="art" width="200px", height="300px" data-pixel="1" data-colors="blue,green,yellow" >
+  <splasher data-size="constant" data-size-params="2" data-map="cornerProximity" data-params="0.1"></splasher>
+  <splasher data-size="constant" data-size-params="3" data-map="cornerProximity" data-params="0.1"></splasher>
+  <splasher data-size="constant" data-size-params="10" data-map="symmetry" data-params="5000"></splasher>
+  <splasher data-size="constant" data-size-params="20" data-map="symmetry" data-params="7000"></splasher>
+  <splasher data-size="constant" data-size-params="30" data-map="centerProximity" data-params="10"></splasher>
+</canvas>
+
+<canvas class="art" width="200px", height="200px" data-pixel="1" data-colors="blue,green,grey" >
+  <plasher data-size="constant" data-size-params="50" data-map="constant" data-params="20000"></plasher>
+  <plasher data-size="constant" data-size-params="20" data-map="constant" data-params="1000"></plasher>
+  <plasher data-size="constant" data-size-params="10" data-map="constant" data-params="5"></plasher>
+  <plasher data-size="constant" data-size-params="5" data-map="constant" data-params="5"></plasher>
+  <plasher data-size="constant" data-size-params="2" data-map="constant" data-params="5"></plasher>
+  <plasher data-size="constant" data-size-params="1" data-map="constant" data-params="5"></plasher>
+</canvas>
+
+<canvas class="art" width="200px", height="200px" data-pixel="1" data-colors="green,grey" >
+  <plasher data-size="constant" data-size-params="30" data-map="symmetry" data-params="600" data-colors="black, red"></splasher>
+  <plasher data-size="constant" data-size-params="10" data-map="centerProximity" data-params="1"></plasher>
+  <plasher data-size="constant" data-size-params="10" data-map="constant" data-params="10"></plasher>
+  <plasher data-size="constant" data-size-params="2" data-map="symmetry" data-params="70"></plasher>
+  <plasher data-size="constant" data-size-params="1" data-map="symmetry" data-params="10"></plasher>
+</canvas>
+
+</body>
+<script type="module" src="dist/index.js"></script>
+</html>
