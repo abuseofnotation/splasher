@@ -38,6 +38,7 @@ export class SplasherEditor {
             };
         };
         this.throttledUpdate = throttle(() => this.updatePreview(), 1000);
+        this.throttledUrlSave = throttle(() => this.saveToUrl(), 1000);
         this.mapDescriptions = {};
         this.availableMaps.forEach(map => {
             this.mapDescriptions[map] = `Map: ${map}`;
@@ -46,16 +47,72 @@ export class SplasherEditor {
         this.availableSizers.forEach(sizer => {
             this.sizerDescriptions[sizer] = `Sizer: ${sizer}`;
         });
+        this.loadFromUrl();
         this.init();
     }
+    loadFromUrl() {
+        const params = new URLSearchParams(window.location.hash.slice(1));
+        const width = params.get('w');
+        const height = params.get('h');
+        const colors = params.get('c');
+        const repeat = params.get('r');
+        const layersJson = params.get('l');
+        if (width)
+            document.getElementById('canvasWidth').value = width;
+        if (height)
+            document.getElementById('canvasHeight').value = height;
+        if (colors)
+            document.getElementById('globalColors').value = colors;
+        if (repeat)
+            document.getElementById('repeatMs').value = repeat;
+        if (layersJson) {
+            try {
+                this.layers = JSON.parse(decodeURIComponent(layersJson));
+            }
+            catch (e) {
+                console.warn('Failed to parse layers from URL:', e);
+                this.layers = [];
+            }
+        }
+        else {
+            this.layers = [];
+        }
+    }
+    saveToUrl() {
+        const width = document.getElementById('canvasWidth').value;
+        const height = document.getElementById('canvasHeight').value;
+        const colors = document.getElementById('globalColors').value;
+        const repeat = document.getElementById('repeatMs').value;
+        const layersJson = encodeURIComponent(JSON.stringify(this.layers));
+        const params = new URLSearchParams();
+        params.set('w', width);
+        params.set('h', height);
+        params.set('c', colors);
+        params.set('r', repeat);
+        params.set('l', layersJson);
+        window.location.hash = params.toString();
+    }
+    throttledUrlSave = null;
     init() {
-        document.getElementById('canvasWidth')?.addEventListener('input', () => this.throttledUpdate());
-        document.getElementById('canvasHeight')?.addEventListener('input', () => this.throttledUpdate());
+        document.getElementById('canvasWidth')?.addEventListener('input', () => {
+            this.throttledUpdate();
+        });
+        document.getElementById('canvasHeight')?.addEventListener('input', () => {
+            this.throttledUpdate();
+        });
         document.getElementById('globalColors')?.addEventListener('input', () => {
             this.throttledUpdate();
         });
-        document.getElementById('repeatMs')?.addEventListener('input', () => this.updateHtmlOutput());
-        this.addLayer();
+        document.getElementById('repeatMs')?.addEventListener('input', () => {
+            this.updateHtmlOutput();
+        });
+        if (this.layers.length === 0) {
+            this.addLayer();
+        }
+        else {
+            this.renderLayersList();
+            this.throttledUpdate();
+        }
     }
     parseHtmlInput() {
         try {
@@ -282,6 +339,7 @@ export class SplasherEditor {
             console.error(e);
         }
         this.updateHtmlOutput();
+        this.throttledUrlSave?.();
     }
     updateHtmlOutput() {
         const width = document.getElementById('canvasWidth').value;

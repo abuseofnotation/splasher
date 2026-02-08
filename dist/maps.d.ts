@@ -2,6 +2,7 @@ export declare const centerProximity: (config: any, intensity?: number) => any[]
 export declare const cornerProximity: (config: any, intensity?: number) => any[][];
 export declare const hallway: (config: any, intensity?: number) => any[][];
 export declare const diagonals: (config: any, intensity?: number) => any[][];
+export declare const line: (config: any, intensity?: number) => any[][];
 export declare const horizontalSymmetry: (config: any, intensity?: number) => any;
 export declare const verticalSymmetry: (config: any, intensity?: number) => any[];
 export declare const symmetry: (config: any, intensity?: number) => any;

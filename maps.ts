@@ -39,7 +39,16 @@ const diagonalsFn = (intensity = 600, {width, height}) => (x, y) => {
   const num = smallestNumber([leftDiagonal, rightDiagonal])
   return Math.floor(num) 
 }
+
+const horizontalLineFn  = (intensity = 600, {width, height}) => (x, y) => {
+  // console.log({width, height, x, y})
+  const distance = 1 + (intensity * Math.abs(width/2 - x))
+  return Math.floor(distance) 
+}
+
 export const diagonals = (config, intensity = 4) => intensityMap(config)(diagonalsFn(intensity, config))
+
+export const line = (config, intensity = 4) => intensityMap(config)(horizontalLineFn(intensity, config))
 
 
 const createSymmetry = (map) => map.map((row, i) => {
@@ -68,7 +77,6 @@ export const symmetry = (config, intensity = 200) => {
 export const constant = (config, intensity = 200) => intensityMap(config)(() => intensity * 10)
 
 
-
 const verticalLinesFn = (intensity = 1, {width, height}) => (x, y) => {
   const xP = cornerDistance(x, width)
   const yP = cornerDistance(y, height)
@@ -85,8 +93,6 @@ export const grandient = (config, intensity = 100) => intensityMap(config)((x, y
 
 
 export const fractal = (config, intensity = 5) => intensityMap(config)((x, y) => ((x ^ y) % intensity === 0) ? 0 : 1)
-
-
 
 export const triangles = (config, intensity = 5) => intensityMap(config)((x, y) =>(((x) & (x^y)) === 0) ? 1: 0)
 

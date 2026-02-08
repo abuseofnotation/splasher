@@ -29,7 +29,12 @@ const diagonalsFn = (intensity = 600, { width, height }) => (x, y) => {
     const num = smallestNumber([leftDiagonal, rightDiagonal]);
     return Math.floor(num);
 };
+const horizontalLineFn = (intensity = 600, { width, height }) => (x, y) => {
+    const distance = 1 + (intensity * Math.abs(width / 2 - x));
+    return Math.floor(distance);
+};
 export const diagonals = (config, intensity = 4) => intensityMap(config)(diagonalsFn(intensity, config));
+export const line = (config, intensity = 4) => intensityMap(config)(horizontalLineFn(intensity, config));
 const createSymmetry = (map) => map.map((row, i) => {
     if (i < map.length / 2) {
         return row;

@@ -9,6 +9,9 @@ export declare class SplasherEditor {
     private sizerDescriptions;
     private currentHtml;
     constructor();
+    private loadFromUrl;
+    private saveToUrl;
+    private throttledUrlSave;
     private init;
     private parseHtmlInput;
     addLayer(): void;

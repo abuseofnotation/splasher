@@ -59,6 +59,7 @@ export class SplasherEditor {
         };
         
         this.throttledUpdate = throttle(() => this.updatePreview(), 1000);
+        this.throttledUrlSave = throttle(() => this.saveToUrl(), 1000);
         
         // Build descriptions from available maps and sizers
         this.mapDescriptions = {};
@@ -71,19 +72,79 @@ export class SplasherEditor {
             this.sizerDescriptions[sizer] = `Sizer: ${sizer}`;
         });
         
+        this.loadFromUrl();
         this.init();
     }
 
+    private loadFromUrl() {
+        const params = new URLSearchParams(window.location.hash.slice(1));
+        
+        const width = params.get('w');
+        const height = params.get('h');
+        const colors = params.get('c');
+        const repeat = params.get('r');
+        const layersJson = params.get('l');
+        
+        if (width) (document.getElementById('canvasWidth') as HTMLInputElement).value = width;
+        if (height) (document.getElementById('canvasHeight') as HTMLInputElement).value = height;
+        if (colors) (document.getElementById('globalColors') as HTMLInputElement).value = colors;
+        if (repeat) (document.getElementById('repeatMs') as HTMLInputElement).value = repeat;
+        
+        if (layersJson) {
+            try {
+                this.layers = JSON.parse(decodeURIComponent(layersJson));
+            } catch (e) {
+                console.warn('Failed to parse layers from URL:', e);
+                this.layers = [];
+            }
+        } else {
+            // No layers in URL, so we'll add a default one in init()
+            this.layers = [];
+        }
+    }
+
+    private saveToUrl() {
+        const width = (document.getElementById('canvasWidth') as HTMLInputElement).value;
+        const height = (document.getElementById('canvasHeight') as HTMLInputElement).value;
+        const colors = (document.getElementById('globalColors') as HTMLInputElement).value;
+        const repeat = (document.getElementById('repeatMs') as HTMLInputElement).value;
+        const layersJson = encodeURIComponent(JSON.stringify(this.layers));
+        
+        const params = new URLSearchParams();
+        params.set('w', width);
+        params.set('h', height);
+        params.set('c', colors);
+        params.set('r', repeat);
+        params.set('l', layersJson);
+        
+        window.location.hash = params.toString();
+    }
+
+    private throttledUrlSave: (() => void) | null = null;
+
     private init() {
         // Canvas settings - auto update on change
-        document.getElementById('canvasWidth')?.addEventListener('input', () => this.throttledUpdate());
-        document.getElementById('canvasHeight')?.addEventListener('input', () => this.throttledUpdate());
+        document.getElementById('canvasWidth')?.addEventListener('input', () => {
+            this.throttledUpdate();
+        });
+        document.getElementById('canvasHeight')?.addEventListener('input', () => {
+            this.throttledUpdate();
+        });
         document.getElementById('globalColors')?.addEventListener('input', () => {
             this.throttledUpdate();
         });
-        document.getElementById('repeatMs')?.addEventListener('input', () => this.updateHtmlOutput());
+        document.getElementById('repeatMs')?.addEventListener('input', () => {
+            this.updateHtmlOutput();
+        });
         
-        this.addLayer();
+        // If no layers were loaded from URL, add a default one
+        if (this.layers.length === 0) {
+            this.addLayer();
+        } else {
+            // Render existing layers loaded from URL
+            this.renderLayersList();
+            this.throttledUpdate();
+        }
     }
 
     private parseHtmlInput() {
@@ -325,6 +386,7 @@ export class SplasherEditor {
         }
 
         this.updateHtmlOutput();
+        this.throttledUrlSave?.();
     }
 
     private updateHtmlOutput() {
